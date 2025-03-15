@@ -1,5 +1,6 @@
 package org.vstu.meaningtree.utils;
 
+import com.sun.jdi.IntegerType;
 import org.vstu.meaningtree.nodes.*;
 import org.vstu.meaningtree.nodes.declarations.*;
 import org.vstu.meaningtree.nodes.definitions.*;
@@ -10,7 +11,11 @@ import org.vstu.meaningtree.nodes.expressions.newexpr.*;
 import org.vstu.meaningtree.nodes.expressions.other.*;
 import org.vstu.meaningtree.nodes.expressions.calls.*;
 import org.vstu.meaningtree.nodes.expressions.comprehensions.*;
+import org.vstu.meaningtree.nodes.expressions.unary.UnaryMinusOp;
+import org.vstu.meaningtree.nodes.expressions.unary.UnaryPlusOp;
 import org.vstu.meaningtree.nodes.statements.*;
+import org.vstu.meaningtree.nodes.statements.conditions.IfStatement;
+import org.vstu.meaningtree.nodes.statements.conditions.components.CaseBlock;
 import org.vstu.meaningtree.nodes.statements.loops.*;
 import org.vstu.meaningtree.nodes.statements.loops.control.*;
 import org.vstu.meaningtree.nodes.statements.assignments.*;
@@ -28,6 +33,8 @@ public interface NodeVisitor<T> {
 
     // Expressions
     T visit(BinaryExpression binaryExpression);
+    T visit(UnaryMinusOp unaryMinusOp);
+    T visut(UnaryPlusOp unaryPlusOp);
     T visit(UnaryExpression unaryExpression);
     T visit(Literal literal);
     T visit(Identifier identifier);
@@ -46,6 +53,18 @@ public interface NodeVisitor<T> {
     
     // Literals
     T visit(NumericLiteral numericLiteral);
+    T visit(FloatLiteral floatLiteral);
+    T visit(IntegerLiteral integerLiteral);
+    T visit(ListLiteral listLiteral);
+    T visit(ArrayLiteral arrayLiteral);
+    T visit(BoolLiteral boolLiteral);
+    T visit(CharacterLiteral characterLiteral);
+    T visit(DictionaryLiteral dictionaryLiteral);
+    T visit(InterpolatedStringLiteral interpolatedStringLiteral);
+    T visit(StringLiteral stringLiteral);
+    T visit(UnmodifiableListLiteral unmodifiableListLiteral);
+    T visit(SetLiteral setLiteral);
+    T visit(PlainCollectionLiteral plainCollectionLiteral);
     T visit(NullLiteral nullLiteral);
     
     // Statements
@@ -62,6 +81,9 @@ public interface NodeVisitor<T> {
     T visit(ContinueStatement continueStatement);
     T visit(AssignmentStatement assignmentStatement);
     T visit(DeleteStatement deleteStatement);
+    T visit(IfStatement ifStatement);
+    T visit(CaseBlock caseBlock);
+    T visit(MultipleAssignmentStatement multipleAssignmentStatement);
     
     // Declarations
     T visit(ClassDeclaration classDeclaration);
@@ -75,8 +97,17 @@ public interface NodeVisitor<T> {
     
     // Types
     T visit(NumericType numericType);
+    T visit(FloatType floatType);
+    T visit(IntType integerType);
+    T visit(PointerType pointerType);
+    T visit(BooleanType booleanType);
+    T visit(UnknownType unknownType);
+    T visit(ReferenceType referenceType);
+    T visit(CharacterType characterType);
+    T visit(GenericUserType genericUserType);
     T visit(UserType userType);
     
     // Comparisons
     T visit(BinaryComparison binaryComparison);
+    T visit(ThreeWayComparisonOp threeWayComparisonOp);
 } 
