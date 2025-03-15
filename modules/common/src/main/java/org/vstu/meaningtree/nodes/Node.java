@@ -1,5 +1,7 @@
 package org.vstu.meaningtree.nodes;
 
+import org.vstu.meaningtree.utils.NodeVisitor;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -105,4 +107,7 @@ abstract public class Node implements Serializable {
         return null;
     }
 
+    public <T> T accept(NodeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }
