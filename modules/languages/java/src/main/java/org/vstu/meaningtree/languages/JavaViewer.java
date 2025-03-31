@@ -58,6 +58,7 @@ import org.vstu.meaningtree.nodes.types.UserType;
 import org.vstu.meaningtree.nodes.types.builtin.*;
 import org.vstu.meaningtree.nodes.types.containers.ArrayType;
 import org.vstu.meaningtree.nodes.types.containers.components.Shape;
+import org.vstu.meaningtree.utils.NodeVisitor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,12 +69,12 @@ import java.util.stream.Collectors;
 import static org.vstu.meaningtree.nodes.enums.AugmentedAssignmentOperator.POW;
 
 public class JavaViewer extends LanguageViewer {
-
     private final String _indentation;
     private int _indentLevel;
     private final boolean _openBracketOnSameLine;
     private final boolean _bracketsAroundCaseBranches;
     private final boolean _autoVariableDeclaration;
+    private final NodeVisitor<String> _decoratingVisitor;
 
     private Scope _currentScope;
     private Scope _typeScope;
@@ -104,7 +105,8 @@ public class JavaViewer extends LanguageViewer {
     public JavaViewer(int indentSpaceCount,
                       boolean openBracketOnSameLine,
                       boolean bracketsAroundCaseBranches,
-                      boolean autoVariableDeclaration
+                      boolean autoVariableDeclaration,
+                      NodeVisitor<String> decoratingVisitor
     ) {
         _indentation = " ".repeat(indentSpaceCount);
         _indentLevel = 0;
@@ -113,110 +115,20 @@ public class JavaViewer extends LanguageViewer {
         _currentScope = new Scope();
         _typeScope = new Scope();
         _autoVariableDeclaration = autoVariableDeclaration;
+
+        _decoratingVisitor = Objects.requireNonNullElse(decoratingVisitor, this);
     }
 
-    public JavaViewer() { this(4, true, false, false); }
-
-    @Override
-    public String visit(Node node) {
-        Objects.requireNonNull(node);
-
-        if (node instanceof Expression expression) {
-            HindleyMilner.inference(expression, _typeScope);
-        }
-        else if (node instanceof Statement statement) {
-            HindleyMilner.inference(statement, _typeScope);
-        }
-
-        return switch (node) {
-            case UnmodifiableListLiteral unmodifiableListLiteral -> visit(unmodifiableListLiteral);
-            case ListLiteral listLiteral -> visit(listLiteral);
-            case InterpolatedStringLiteral interpolatedStringLiteral -> visit(interpolatedStringLiteral);
-            case FloatLiteral l -> visit(l);
-            case IntegerLiteral l -> visit(l);
-            case StringLiteral l -> visit(l);
-            case SelfReference selfReference -> visit(selfReference);
-            case UnaryMinusOp unaryMinusOp -> visit(unaryMinusOp);
-            case UnaryPlusOp unaryPlusOp -> visit(unaryPlusOp);
-            case AddOp op -> visit(op);
-            case SubOp op -> visit(op);
-            case MulOp op -> visit(op);
-            case DivOp op -> visit(op);
-            case ModOp op -> visit(op);
-            case FloorDivOp op -> visit(op);
-            case EqOp op -> visit(op);
-            case GeOp op -> visit(op);
-            case GtOp op -> visit(op);
-            case LeOp op -> visit(op);
-            case LtOp op -> visit(op);
-            case NotEqOp op -> visit(op);
-            case ShortCircuitAndOp op -> visit(op);
-            case ShortCircuitOrOp op -> visit(op);
-            case NotOp op -> visit(op);
-            case ParenthesizedExpression expr -> visit(expr);
-            case AssignmentExpression expr -> visit(expr);
-            case AssignmentStatement stmt -> visit(stmt);
-            case FieldDeclaration decl -> visit(decl);
-            case VariableDeclaration stmt -> visit(stmt);
-            case CompoundStatement stmt -> visit(stmt);
-            case ExpressionStatement stmt -> visit(stmt);
-            case SimpleIdentifier expr -> visit(expr);
-            case IfStatement stmt -> visit(stmt);
-            case GeneralForLoop stmt -> visit(stmt);
-            case CompoundComparison cmp -> visit(cmp);
-            case RangeForLoop rangeLoop -> visit(rangeLoop);
-            case ProgramEntryPoint entryPoint -> visit(entryPoint);
-            case MethodCall methodCall -> visit(methodCall);
-            case PrintValues printValues -> visit(printValues);
-            case FunctionCall funcCall -> visit(funcCall);
-            case WhileLoop whileLoop -> visit(whileLoop);
-            case ScopedIdentifier scopedIdent -> visit(scopedIdent);
-            case PostfixIncrementOp inc -> visit(inc);
-            case PostfixDecrementOp dec -> visit(dec);
-            case PrefixIncrementOp inc -> visit(inc);
-            case PrefixDecrementOp dec -> visit(dec);
-            case PowOp op -> visit(op);
-            case PackageDeclaration decl -> visit(decl);
-            case ClassDeclaration decl -> visit(decl);
-            case ClassDefinition def -> visit(def);
-            case Comment comment -> visit(comment);
-            case BreakStatement stmt -> visit(stmt);
-            case ContinueStatement stmt -> visit(stmt);
-            case ObjectConstructorDefinition objectConstructor -> visit(objectConstructor);
-            case MethodDefinition methodDefinition -> visit(methodDefinition);
-            case SwitchStatement switchStatement -> visit(switchStatement);
-            case NullLiteral nullLiteral -> visit(nullLiteral);
-            case StaticImportAll staticImportAll -> visit(staticImportAll);
-            case StaticImportMembers staticImportMembers -> visit(staticImportMembers);
-            case ImportAll importAll -> visit(importAll);
-            case ImportMembers importMembers -> visit(importMembers);
-            case UserType userType -> visit(userType);
-            case ObjectNewExpression objectNewExpression -> visit(objectNewExpression);
-            case BoolLiteral boolLiteral -> visit(boolLiteral);
-            case MemberAccess memberAccess -> visit(memberAccess);
-            case ArrayNewExpression arrayNewExpression -> visit(arrayNewExpression);
-            case ArrayInitializer arrayInitializer -> visit(arrayInitializer);
-            case ReturnStatement returnStatement -> visit(returnStatement);
-            case CastTypeExpression castTypeExpression -> visit(castTypeExpression);
-            case IndexExpression indexExpression -> visit(indexExpression);
-            case TernaryOperator ternaryOperator -> visit(ternaryOperator);
-            case BitwiseAndOp bitwiseAndOp -> visit(bitwiseAndOp);
-            case BitwiseOrOp bitwiseOrOp -> visit(bitwiseOrOp);
-            case XorOp xorOp -> visit(xorOp);
-            case InversionOp inversionOp -> visit(inversionOp);
-            case LeftShiftOp leftShiftOp -> visit(leftShiftOp);
-            case RightShiftOp rightShiftOp -> visit(rightShiftOp);
-            case MultipleAssignmentStatement multipleAssignmentStatement -> visit(multipleAssignmentStatement);
-            case InfiniteLoop infiniteLoop -> visit(infiniteLoop);
-            case ExpressionSequence expressionSequence -> visit(expressionSequence);
-            case CharacterLiteral characterLiteral -> visit(characterLiteral);
-            case DoWhileLoop doWhileLoop -> visit(doWhileLoop);
-            case PointerPackOp ptr -> visit(ptr.getArgument());
-            case PointerUnpackOp ptr -> visit(ptr.getArgument());
-            case PointerType ptr -> visit(ptr.getTargetType());
-            case ReferenceType ref -> visit(ref.getTargetType());
-            default -> throw new IllegalStateException(String.format("Can't stringify node %s", node.getClass()));
-        };
+    public JavaViewer() {
+        super();
+        _indentation = " ".repeat(4);
+        _indentLevel = 0;
+        _openBracketOnSameLine = true;
+        _bracketsAroundCaseBranches = false;
+        _autoVariableDeclaration = false;
+        _currentScope = new Scope();
+        _typeScope = new Scope();
+        _decoratingVisitor = this;
     }
 
     public String visit(UnmodifiableListLiteral unmodifiableListLiteral) {
@@ -224,7 +136,7 @@ public class JavaViewer extends LanguageViewer {
         builder.append("new Object[] {");
 
         for (Expression expression : unmodifiableListLiteral.getList()) {
-            builder.append(visit(expression)).append(", ");
+            builder.append(expression.accept(_decoratingVisitor)).append(", ");
         }
 
         if (builder.length() > 2) {
@@ -241,7 +153,7 @@ public class JavaViewer extends LanguageViewer {
         builder.append("new Object[] {");
 
         for (Expression expression : listLiteral.getList()) {
-            builder.append(visit(expression)).append(", ");
+            builder.append(expression.accept(_decoratingVisitor)).append(", ");
         }
 
         if (builder.length() > 2) {
@@ -262,20 +174,20 @@ public class JavaViewer extends LanguageViewer {
             Type exprType = HindleyMilner.inference(stringPart, _typeScope);
             switch (exprType) {
                 case StringType stringType -> {
-                    var string = visit(stringPart);
+                    var string = stringPart.accept(_decoratingVisitor);
                     builder.append(string, 1, string.length() - 1);
                 }
                 case IntType integerType -> {
                     builder.append("%d");
-                    argumentsBuilder.append(visit(stringPart)).append(", ");
+                    argumentsBuilder.append(stringPart.accept(_decoratingVisitor)).append(", ");
                 }
                 case FloatType floatType -> {
                     builder.append("%f");
-                    argumentsBuilder.append(visit(stringPart)).append(", ");
+                    argumentsBuilder.append(stringPart.accept(_decoratingVisitor)).append(", ");
                 }
                 default -> {
                     builder.append("%s");
-                    argumentsBuilder.append(visit(stringPart)).append(", ");
+                    argumentsBuilder.append(stringPart.accept(_decoratingVisitor)).append(", ");
                 }
             }
         }
@@ -306,7 +218,7 @@ public class JavaViewer extends LanguageViewer {
 
             if (printValues.separator != null) {
                 builder
-                        .append(visit(printValues.separator))
+                        .append(printValues.separator.accept(_decoratingVisitor))
                         .append(", ");
             }
 
@@ -319,7 +231,7 @@ public class JavaViewer extends LanguageViewer {
             builder.deleteCharAt(builder.length() - 1);
 
             if (!printValues.addsNewLine() && printValues.end != null) {
-                builder.append(visit(printValues.end));
+                builder.append(printValues.end.accept(_decoratingVisitor));
             }
 
             builder.append(")");
@@ -336,11 +248,11 @@ public class JavaViewer extends LanguageViewer {
     }
 
     public String visit(UnaryPlusOp unaryPlusOp) {
-        return "+" + visit(unaryPlusOp.getArgument());
+        return "+" + unaryPlusOp.getArgument().accept(_decoratingVisitor);
     }
 
     public String visit(UnaryMinusOp unaryMinusOp) {
-        return "-" + visit(unaryMinusOp.getArgument());
+        return "-" + unaryMinusOp.getArgument().accept(_decoratingVisitor);
     }
 
     public String visit(DoWhileLoop doWhileLoop) {
@@ -367,7 +279,7 @@ public class JavaViewer extends LanguageViewer {
         increaseIndentLevel();
         for (Node node : nodes) {
             builder
-                    .append(indent(visit(node)))
+                    .append(indent(node.accept(_decoratingVisitor)))
                     .append("\n");
         }
         decreaseIndentLevel();
@@ -381,7 +293,7 @@ public class JavaViewer extends LanguageViewer {
 
         builder.append(
                 "while %s;".formatted(
-                        visit(doWhileLoop.getCondition())
+                        doWhileLoop.getCondition().accept(_decoratingVisitor)
                 )
         );
 
@@ -399,7 +311,7 @@ public class JavaViewer extends LanguageViewer {
          StringBuilder builder = new StringBuilder();
 
          for (Expression expression : expressionSequence.getExpressions()) {
-             builder.append(visit(expression)).append(", ");
+             builder.append(expression.accept(_decoratingVisitor)).append(", ");
          }
 
          // Удаляем лишние пробел и запятую
@@ -420,17 +332,17 @@ public class JavaViewer extends LanguageViewer {
             if (_openBracketOnSameLine) {
                 builder
                         .append(" ")
-                        .append(visit(compoundStatement));
+                        .append(compoundStatement.accept(_decoratingVisitor));
             }
             else {
                 builder.append("\n");
-                builder.append(indent(visit(body)));
+                builder.append(indent(body.accept(_decoratingVisitor)));
             }
         }
         else {
             builder.append("\n");
             increaseIndentLevel();
-            builder.append(indent(visit(body)));
+            builder.append(indent(body.accept(_decoratingVisitor)));
             decreaseIndentLevel();
         }
 
@@ -460,7 +372,7 @@ public class JavaViewer extends LanguageViewer {
             builder.append(parameters);
         }
 
-        String body = visit(objectConstructor.getBody());
+        String body = objectConstructor.getBody().accept(_decoratingVisitor);
         if (_openBracketOnSameLine)
             { builder.append(" ").append(body); }
         else
@@ -473,7 +385,7 @@ public class JavaViewer extends LanguageViewer {
         StringBuilder builder = new StringBuilder();
 
         for (AssignmentStatement stmt : multipleAssignmentStatement.getStatements()) {
-            builder.append(visit(stmt)).append("\n");
+            builder.append(stmt.accept(_decoratingVisitor)).append("\n");
         }
 
         // Удаляем последний перевод строки
@@ -509,28 +421,30 @@ public class JavaViewer extends LanguageViewer {
     }
 
     public String visit(TernaryOperator ternaryOperator) {
-        String condition = visit(ternaryOperator.getCondition());
-        String consequence = visit(ternaryOperator.getThenExpr());
-        String alternative = visit(ternaryOperator.getElseExpr());
+        String condition = ternaryOperator.getCondition().accept(_decoratingVisitor);
+        String consequence = ternaryOperator.getThenExpr().accept(_decoratingVisitor);
+        String alternative = ternaryOperator.getElseExpr().accept(_decoratingVisitor);
         return "%s ? %s : %s".formatted(condition, consequence, alternative);
     }
 
     public String visit(IndexExpression indexExpression) {
         Expression arrayName = indexExpression.getExpr();
-        String name = visit(arrayName);
-        String index = visit(indexExpression.getIndex());
+        String name = arrayName.accept(_decoratingVisitor);
+        String index = indexExpression.getIndex().accept(_decoratingVisitor);
         return "%s[%s]".formatted(name, index);
     }
 
     public String visit(CastTypeExpression castTypeExpression) {
-        String castType = visit(castTypeExpression.getCastType());
-        String value = visit(castTypeExpression.getValue());
+        String castType = castTypeExpression.getCastType().accept(_decoratingVisitor);
+        String value = castTypeExpression.getValue().accept(_decoratingVisitor);
         return "(%s) %s".formatted(castType, value);
     }
 
     public String visit(ReturnStatement returnStatement) {
         Expression expression = returnStatement.getExpression();
-        return (expression != null) ? "return %s;".formatted(visit(expression)) : "return;";
+        return (expression != null)
+                ? "return %s;".formatted(expression.accept(_decoratingVisitor))
+                : "return;";
     }
 
     public String visit(ArrayInitializer initializer) {
@@ -540,7 +454,7 @@ public class JavaViewer extends LanguageViewer {
         List<Expression> values = initializer.getValues();
         for (Expression value : values) {
             builder
-                    .append(visit(value))
+                    .append(value.accept(_decoratingVisitor))
                     .append(", ");
         }
 
@@ -558,15 +472,15 @@ public class JavaViewer extends LanguageViewer {
         StringBuilder builder = new StringBuilder();
         builder.append("new ");
 
-        String type = visit(arrayNewExpression.getType());
+        String type = arrayNewExpression.getType().accept(_decoratingVisitor);
         builder.append(type);
 
-        String dimensions = visit(arrayNewExpression.getShape());
+        String dimensions = arrayNewExpression.getShape().accept(_decoratingVisitor);
         builder.append(dimensions);
 
         ArrayInitializer optionalInitializer = arrayNewExpression.getInitializer();
         if (optionalInitializer != null) {
-            String initializer = visit(optionalInitializer);
+            String initializer = optionalInitializer.accept(_decoratingVisitor);
             builder.append(" ").append(initializer);
         }
 
@@ -574,8 +488,8 @@ public class JavaViewer extends LanguageViewer {
     }
 
     public String visit(MemberAccess memberAccess) {
-        String object = visit(memberAccess.getExpression());
-        String member = visit(memberAccess.getMember());
+        String object = memberAccess.getExpression().accept(_decoratingVisitor);
+        String member = memberAccess.getMember().accept(_decoratingVisitor);
         return "%s.%s".formatted(object, member);
     }
 
@@ -584,7 +498,7 @@ public class JavaViewer extends LanguageViewer {
     }
 
     public String visit(ObjectNewExpression objectNewExpression) {
-        String typeName = visit(objectNewExpression.getType());
+        String typeName = objectNewExpression.getType().accept(_decoratingVisitor);
 
         String arguments = objectNewExpression
                 .getConstructorArguments()
@@ -596,8 +510,8 @@ public class JavaViewer extends LanguageViewer {
     }
 
     public String visit(MethodCall methodCall) {
-        String object = visit(methodCall.getObject());
-        String methodName = visit(methodCall.getFunctionName());
+        String object = methodCall.getObject().accept(_decoratingVisitor);
+        String methodName = methodCall.getFunctionName().accept(_decoratingVisitor);
 
         String arguments = methodCall
                 .getArguments()
@@ -609,12 +523,12 @@ public class JavaViewer extends LanguageViewer {
     }
 
     public String visit(UserType userType) {
-        return visit(userType.getName());
+        return userType.getName().accept(_decoratingVisitor);
     }
 
     public String visit(StaticImportAll staticImportAll) {
         String importTemplate = "import static %s.*;";
-        return importTemplate.formatted(visit(staticImportAll.getScope()));
+        return importTemplate.formatted(staticImportAll.getScope().accept(_decoratingVisitor));
     }
 
     public String visit(StaticImportMembers staticImportMembers) {
@@ -625,8 +539,8 @@ public class JavaViewer extends LanguageViewer {
             builder
                     .append(
                             importTemplate.formatted(
-                                    visit(staticImportMembers.getScope()),
-                                    visit(member)
+                                    staticImportMembers.getScope().accept(_decoratingVisitor),
+                                    member.accept(_decoratingVisitor)
                             )
                     )
                     .append("\n");
@@ -652,8 +566,8 @@ public class JavaViewer extends LanguageViewer {
             builder
                     .append(
                         importTemplate.formatted(
-                            visit(importMembers.getScope()),
-                            visit(member)
+                            importMembers.getScope().accept(_decoratingVisitor),
+                            member.accept(_decoratingVisitor)
                         )
                     )
                     .append("\n");
@@ -678,7 +592,7 @@ public class JavaViewer extends LanguageViewer {
         Statement caseBlockBody;
         if (caseBlock instanceof MatchValueCaseBlock mvcb) {
             builder.append("case ");
-            builder.append(visit(mvcb.getMatchValue()));
+            builder.append(mvcb.getMatchValue().accept(_decoratingVisitor));
             builder.append(":");
             caseBlockBody = mvcb.getBody();
         }
@@ -725,7 +639,7 @@ public class JavaViewer extends LanguageViewer {
 
             for (Node node : nodesList) {
                 builder
-                        .append(indent(visit(node)))
+                        .append(indent(node.accept(_decoratingVisitor)))
                         .append("\n");
             }
 
@@ -752,7 +666,7 @@ public class JavaViewer extends LanguageViewer {
         StringBuilder builder = new StringBuilder();
 
         builder.append("switch (");
-        builder.append(visit(switchStatement.getTargetExpression()));
+        builder.append(switchStatement.getTargetExpression().accept(_decoratingVisitor));
         builder.append(") ");
 
         if (_openBracketOnSameLine) {
@@ -775,8 +689,8 @@ public class JavaViewer extends LanguageViewer {
     }
 
     private String visit(DeclarationArgument parameter) {
-        String type = visit(parameter.getType());
-        String name = visit(parameter.getName());
+        String type = parameter.getType().accept(_decoratingVisitor);
+        String name = parameter.getName().accept(_decoratingVisitor);
         return "%s %s".formatted(type, name);
     }
 
@@ -792,7 +706,7 @@ public class JavaViewer extends LanguageViewer {
         int i;
         for (i = 0; i < parameters.size(); i++) {
             DeclarationArgument parameter = parameters.get(i);
-            builder.append("%s, ".formatted(visit(parameter)));
+            builder.append("%s, ".formatted(parameter.accept(_decoratingVisitor)));
         }
 
         // Удаляем последний пробел и запятую, если был хотя бы один параметр
@@ -813,10 +727,10 @@ public class JavaViewer extends LanguageViewer {
             builder.append(modifiersList).append(" ");
         }
 
-        String returnType = visit(methodDeclaration.getReturnType());
+        String returnType = methodDeclaration.getReturnType().accept(_decoratingVisitor);
         builder.append(returnType).append(" ");
 
-        String name = visit(methodDeclaration.getName());
+        String name = methodDeclaration.getName().accept(_decoratingVisitor);
         builder.append(name);
 
         String parameters = toStringParameters(methodDeclaration.getArguments());
@@ -829,10 +743,10 @@ public class JavaViewer extends LanguageViewer {
         StringBuilder builder = new StringBuilder();
 
         // Преобразование типа нужно, чтобы избежать вызова toString(Node node)
-        String methodDeclaration = visit((MethodDeclaration) methodDefinition.getDeclaration());
+        String methodDeclaration = ((MethodDeclaration) methodDefinition.getDeclaration()).accept(_decoratingVisitor);
         builder.append(methodDeclaration);
 
-        String body = visit(methodDefinition.getBody());
+        String body = methodDefinition.getBody().accept(_decoratingVisitor);
         if (_openBracketOnSameLine)
             { builder.append(" ").append(body); }
         else
@@ -868,7 +782,7 @@ public class JavaViewer extends LanguageViewer {
         }
 
         VariableDeclaration variableDeclaration = new VariableDeclaration(decl.getType(), decl.getDeclarators());
-        builder.append(visit(variableDeclaration));
+        builder.append(variableDeclaration.accept(_decoratingVisitor));
 
         return builder.toString();
     }
@@ -878,15 +792,15 @@ public class JavaViewer extends LanguageViewer {
 
         for (DeclarationModifier modifier : modifiers) {
             builder.append(
-                    switch (modifier) {
-                        case PUBLIC -> "public";
-                        case PRIVATE -> "private";
-                        case PROTECTED -> "protected";
-                        case ABSTRACT -> "abstract";
-                        case CONST -> "final";
-                        case STATIC -> "static";
-                        default -> throw new IllegalArgumentException();
-                    }
+                switch (modifier) {
+                    case PUBLIC -> "public";
+                    case PRIVATE -> "private";
+                    case PROTECTED -> "protected";
+                    case ABSTRACT -> "abstract";
+                    case CONST -> "final";
+                    case STATIC -> "static";
+                    default -> throw new IllegalArgumentException();
+                }
             ).append(" ");
         }
 
@@ -904,16 +818,16 @@ public class JavaViewer extends LanguageViewer {
             modifiers += " ";
         }
 
-        return modifiers + "class " + visit(decl.getName());
+        return modifiers + "class " + decl.getName().accept(_decoratingVisitor);
     }
 
     public String visit(ClassDefinition def) {
         StringBuilder builder = new StringBuilder();
 
-        String declaration = visit(def.getDeclaration());
+        String declaration = def.getDeclaration().accept(_decoratingVisitor);
         builder.append(declaration);
 
-        String body = visit(def.getBody());
+        String body = def.getBody().accept(_decoratingVisitor);
         if (_openBracketOnSameLine)
         { builder.append(" ").append(body); }
         else
@@ -947,7 +861,12 @@ public class JavaViewer extends LanguageViewer {
     }
 
     private String visit(BinaryExpression expr, String sign) {
-        return String.format("%s %s %s", visit(expr.getLeft()), sign, visit(expr.getRight()));
+        return String.format(
+                "%s %s %s",
+                expr.getLeft().accept(_decoratingVisitor),
+                sign,
+                expr.getRight().accept(_decoratingVisitor)
+        );
     }
 
     public String visit(AddOp op) {
@@ -1007,16 +926,16 @@ public class JavaViewer extends LanguageViewer {
     }
 
     public String visit(NotOp op) {
-        return String.format("!%s", visit(op.getArgument()));
+        return String.format("!%s", op.getArgument().accept(_decoratingVisitor));
     }
 
     public String visit(ParenthesizedExpression expr) {
-        return String.format("(%s)", visit(expr.getExpression()));
+        return String.format("(%s)", expr.getExpression().accept(_decoratingVisitor));
     }
 
     private String visit(AugmentedAssignmentOperator op, Expression left, Expression right) {
-        String l = visit(left);
-        String r = visit(right);
+        String l = left.accept(_decoratingVisitor);
+        String r = right.accept(_decoratingVisitor);
 
         // В Java нет встроенного оператора возведения в степень, следовательно,
         // нет и соотвествующего оператора присванивания, поэтому этот случай обрабатываем по особому
@@ -1074,10 +993,10 @@ public class JavaViewer extends LanguageViewer {
                 variableType = _typeScope.getVariableType(identifier);
                 Objects.requireNonNull(variableType); // Никогда не будет null...
 
-                String typeName = visit(variableType);
-                String variableName = visit(identifier);
+                String typeName = variableType.accept(_decoratingVisitor);
+                String variableName = identifier.accept(_decoratingVisitor);
                 addVariableToCurrentScope(identifier, variableType);
-                return "%s %s = %s;".formatted(typeName, variableName, visit(rightValue));
+                return "%s %s = %s;".formatted(typeName, variableName, rightValue.accept(_decoratingVisitor));
             }
         }
 
@@ -1086,15 +1005,15 @@ public class JavaViewer extends LanguageViewer {
 
     public String visit(Type type) {
         return switch (type) {
-            case FloatType floatType -> visit(floatType);
-            case IntType intType -> visit(intType);
-            case BooleanType booleanType -> visit(booleanType);
-            case StringType stringType -> visit(stringType);
-            case NoReturn voidType -> visit(voidType);
-            case UnknownType unknownType -> visit(unknownType);
-            case ArrayType arrayType -> visit(arrayType);
-            case UserType userType -> visit(userType);
-            case CharacterType characterType -> visit(characterType);
+            case FloatType floatType -> floatType.accept(_decoratingVisitor);
+            case IntType intType -> intType.accept(_decoratingVisitor);
+            case BooleanType booleanType -> booleanType.accept(_decoratingVisitor);
+            case StringType stringType -> stringType.accept(_decoratingVisitor);
+            case NoReturn voidType -> voidType.accept(_decoratingVisitor);
+            case UnknownType unknownType -> unknownType.accept(_decoratingVisitor);
+            case ArrayType arrayType -> arrayType.accept(_decoratingVisitor);
+            case UserType userType -> userType.accept(_decoratingVisitor);
+            case CharacterType characterType -> characterType.accept(_decoratingVisitor);
             default -> throw new IllegalStateException("Unexpected value: " + type.getClass());
         };
     }
@@ -1135,7 +1054,7 @@ public class JavaViewer extends LanguageViewer {
 
             Expression dimension = shape.getDimension(i);
             if (dimension != null) {
-                builder.append(visit(dimension));
+                builder.append(dimension.accept(_decoratingVisitor));
             }
 
             builder.append("]");
@@ -1147,9 +1066,9 @@ public class JavaViewer extends LanguageViewer {
     private String visit(ArrayType type) {
         StringBuilder builder = new StringBuilder();
 
-        String baseType = visit(type.getItemType());
+        String baseType = type.getItemType().accept(_decoratingVisitor);
         builder.append(baseType);
-        builder.append(visit(type.getShape()));
+        builder.append(type.getShape().accept(_decoratingVisitor));
 
         return builder.toString();
     }
@@ -1167,11 +1086,11 @@ public class JavaViewer extends LanguageViewer {
 
         addVariableToCurrentScope(identifier, variableType);
 
-        String identifierName = visit(identifier);
+        String identifierName = identifier.accept(_decoratingVisitor);
         builder.append(identifierName);
 
         if (rValue != null) {
-            builder.append(" = ").append(visit(rValue));
+            builder.append(" = ").append(rValue.accept(_decoratingVisitor));
         }
 
         return builder.toString();
@@ -1181,13 +1100,13 @@ public class JavaViewer extends LanguageViewer {
         StringBuilder builder = new StringBuilder();
 
         Type declarationType = stmt.getType();
-        String type = visit(declarationType);
+        String type = declarationType.accept(_decoratingVisitor);
         builder
                 .append(type)
                 .append(" ");
 
         for (VariableDeclarator varDecl : stmt.getDeclarators()) {
-            builder.append(visit(varDecl)).append(", ");
+            builder.append(varDecl.accept(_decoratingVisitor)).append(", ");
         }
         // Чтобы избежать лишней головной боли на проверки "а последняя ли это декларация",
         // я автоматически после каждой декларации добавляю запятую и пробел,
@@ -1225,7 +1144,7 @@ public class JavaViewer extends LanguageViewer {
         builder.append("{\n");
         increaseIndentLevel();
         for (Node node : stmt) {
-            String s = visit(node);
+            String s = node.accept(_decoratingVisitor);
             if (s.isEmpty()) {
                 continue;
             }
@@ -1239,7 +1158,7 @@ public class JavaViewer extends LanguageViewer {
     }
 
     public String visit(ExpressionStatement stmt) {
-        return String.format("%s;", visit(stmt.getExpression()));
+        return String.format("%s;", stmt.getExpression().accept(_decoratingVisitor));
     }
 
     public String visit(SimpleIdentifier identifier) {
@@ -1249,7 +1168,7 @@ public class JavaViewer extends LanguageViewer {
     private String visit(ConditionBranch branch) {
         StringBuilder builder = new StringBuilder();
 
-        String cond = visit(branch.getCondition());
+        String cond = branch.getCondition().accept(_decoratingVisitor);
         builder
                 .append("(")
                 .append(cond)
@@ -1266,12 +1185,12 @@ public class JavaViewer extends LanguageViewer {
             if (_openBracketOnSameLine) {
                 builder
                         .append(" ")
-                        .append(visit(compStmt));
+                        .append(compStmt.accept(_decoratingVisitor));
             }
             else {
                 builder
                         .append("\n")
-                        .append(indent(visit(compStmt)));
+                        .append(indent(compStmt.accept(_decoratingVisitor)));
             }
         }
         else {
@@ -1281,7 +1200,7 @@ public class JavaViewer extends LanguageViewer {
             // if (a > b)
             //     max = a;
             increaseIndentLevel();
-            builder.append("\n").append(indent(visit(body)));
+            builder.append("\n").append(indent(body.accept(_decoratingVisitor)));
             decreaseIndentLevel();
         }
 
@@ -1290,12 +1209,12 @@ public class JavaViewer extends LanguageViewer {
 
     private String visit(BinaryComparison binComp) {
         return switch (binComp) {
-            case EqOp op -> visit(op);
-            case GeOp op -> visit(op);
-            case GtOp op -> visit(op);
-            case LeOp op -> visit(op);
-            case LtOp op -> visit(op);
-            case NotEqOp op -> visit(op);
+            case EqOp op -> op.accept(_decoratingVisitor);
+            case GeOp op -> op.accept(_decoratingVisitor);
+            case GtOp op -> op.accept(_decoratingVisitor);
+            case LeOp op -> op.accept(_decoratingVisitor);
+            case LtOp op -> op.accept(_decoratingVisitor);
+            case NotEqOp op -> op.accept(_decoratingVisitor);
             default -> throw new IllegalStateException("Unexpected value: " + binComp);
         };
     }
@@ -1304,7 +1223,7 @@ public class JavaViewer extends LanguageViewer {
         StringBuilder builder = new StringBuilder();
 
         for (BinaryComparison binComp : cmp.getComparisons()) {
-            builder.append(visit(binComp)).append(" && ");
+            builder.append(binComp.accept(_decoratingVisitor)).append(" && ");
         }
 
         builder.delete(builder.length() - 4, builder.length());
@@ -1318,13 +1237,13 @@ public class JavaViewer extends LanguageViewer {
         builder.append("if ");
         List<ConditionBranch> branches = stmt.getBranches();
         builder
-                .append(visit(branches.getFirst()))
+                .append(branches.getFirst().accept(_decoratingVisitor))
                 .append("\n");
 
         for (ConditionBranch branch : branches.subList(1, branches.size())) {
             builder
                     .append(indent("else if "))
-                    .append(visit(branch))
+                    .append(branch.accept(_decoratingVisitor))
                     .append("\n");
         }
 
@@ -1335,24 +1254,24 @@ public class JavaViewer extends LanguageViewer {
             if (elseBranch instanceof IfStatement innerIfStmt) {
                 builder
                         .append(" ")
-                        .append(visit(innerIfStmt));
+                        .append(innerIfStmt.accept(_decoratingVisitor));
             }
             else if (elseBranch instanceof CompoundStatement innerCompStmt) {
                 if (_openBracketOnSameLine) {
                     builder
                             .append(" ")
-                            .append(visit(innerCompStmt));
+                            .append(innerCompStmt.accept(_decoratingVisitor));
                 }
                 else {
                     builder
                             .append("\n")
-                            .append(indent(visit(innerCompStmt)));
+                            .append(indent(innerCompStmt.accept(_decoratingVisitor)));
                 }
             }
             else {
                 builder
                         .append("\n")
-                        .append(visit(elseBranch));
+                        .append(elseBranch.accept(_decoratingVisitor));
             }
         }
         else {
@@ -1365,9 +1284,9 @@ public class JavaViewer extends LanguageViewer {
 
     private String visit(HasInitialization init) {
         return switch (init) {
-            case AssignmentExpression expr -> visit(expr);
-            case AssignmentStatement stmt -> visit(stmt);
-            case VariableDeclaration decl -> visit(decl);
+            case AssignmentExpression expr -> expr.accept(_decoratingVisitor);
+            case AssignmentStatement stmt -> stmt.accept(_decoratingVisitor);
+            case VariableDeclaration decl -> decl.accept(_decoratingVisitor);
             case MultipleAssignmentStatement multipleAssignmentStatement -> {
                 // Трансляция MultipleAssignmentStatement по умолчанию не подходит -
                 // в результате будут получены присваивания, написанные через точку с запятой.
@@ -1380,7 +1299,7 @@ public class JavaViewer extends LanguageViewer {
                             assignmentStatement.getRValue()
                     );
                     builder
-                            .append(visit(assignmentExpression))
+                            .append(assignmentExpression.accept(_decoratingVisitor))
                             .append(", ");
                 }
 
@@ -1417,13 +1336,13 @@ public class JavaViewer extends LanguageViewer {
         }
 
         if (generalForLoop.hasCondition()) {
-            String condition = visit(generalForLoop.getCondition());
+            String condition = generalForLoop.getCondition().accept(_decoratingVisitor);
             builder.append(condition);
         }
         builder.append("; ");
 
         if (generalForLoop.hasUpdate()) {
-            String update = visit(generalForLoop.getUpdate());
+            String update = generalForLoop.getUpdate().accept(_decoratingVisitor);
             builder.append(update);
         }
 
@@ -1434,17 +1353,17 @@ public class JavaViewer extends LanguageViewer {
             if (_openBracketOnSameLine) {
                 builder
                         .append(" ")
-                        .append(visit(compoundStatement));
+                        .append(compoundStatement.accept(_decoratingVisitor));
             }
             else {
                 builder.append("\n");
-                builder.append(indent(visit(body)));
+                builder.append(indent(body.accept(_decoratingVisitor)));
             }
         }
         else {
             builder.append(")\n");
             increaseIndentLevel();
-            builder.append(indent(visit(body)));
+            builder.append(indent(body.accept(_decoratingVisitor)));
             decreaseIndentLevel();
         }
 
@@ -1456,20 +1375,20 @@ public class JavaViewer extends LanguageViewer {
             long stepValue = forRangeLoop.getStepValueAsLong();
 
             if (stepValue == 1) {
-                return String.format("%s++", visit(forRangeLoop.getIdentifier()));
+                return String.format("%s++", forRangeLoop.getIdentifier().accept(_decoratingVisitor));
             }
             else {
-                return String.format("%s += %d", visit(forRangeLoop.getIdentifier()), stepValue);
+                return String.format("%s += %d", forRangeLoop.getIdentifier().accept(_decoratingVisitor), stepValue);
             }
         }
         else if (forRangeLoop.getRange().getType() == Range.Type.DOWN) {
             long stepValue = forRangeLoop.getStepValueAsLong();
 
             if (stepValue == 1) {
-                return String.format("%s--", visit(forRangeLoop.getIdentifier()));
+                return String.format("%s--", forRangeLoop.getIdentifier().accept(_decoratingVisitor));
             }
             else {
-                return String.format("%s -= %d", visit(forRangeLoop.getIdentifier()), stepValue);
+                return String.format("%s -= %d", forRangeLoop.getIdentifier().accept(_decoratingVisitor), stepValue);
             }
         }
 
@@ -1481,11 +1400,11 @@ public class JavaViewer extends LanguageViewer {
             String header = "int %s = %s; %s %s %s; %s";
             String compOperator = forRangeLoop.isExcludingStop() ? "<" : "<=";
             return header.formatted(
-                    visit(forRangeLoop.getIdentifier()),
-                    visit(forRangeLoop.getStart()),
-                    visit(forRangeLoop.getIdentifier()),
+                    forRangeLoop.getIdentifier().accept(_decoratingVisitor),
+                    forRangeLoop.getStart().accept(_decoratingVisitor),
+                    forRangeLoop.getIdentifier().accept(_decoratingVisitor),
                     compOperator,
-                    visit(forRangeLoop.getStop()),
+                    forRangeLoop.getStop().accept(_decoratingVisitor),
                     getForRangeUpdate(forRangeLoop)
             );
         }
@@ -1493,11 +1412,11 @@ public class JavaViewer extends LanguageViewer {
             String header = "int %s = %s; %s %s %s; %s";
             String compOperator = forRangeLoop.isExcludingStop() ? ">" : ">=";
             return header.formatted(
-                    visit(forRangeLoop.getIdentifier()),
-                    visit(forRangeLoop.getStart()),
-                    visit(forRangeLoop.getIdentifier()),
+                    forRangeLoop.getIdentifier().accept(_decoratingVisitor),
+                    forRangeLoop.getStart().accept(_decoratingVisitor),
+                    forRangeLoop.getIdentifier().accept(_decoratingVisitor),
                     compOperator,
-                    visit(forRangeLoop.getStop()),
+                    forRangeLoop.getStop().accept(_decoratingVisitor),
                     getForRangeUpdate(forRangeLoop)
             );
         }
@@ -1516,17 +1435,17 @@ public class JavaViewer extends LanguageViewer {
             if (_openBracketOnSameLine) {
                 builder
                         .append(" ")
-                        .append(visit(compoundStatement));
+                        .append(compoundStatement.accept(_decoratingVisitor));
             }
             else {
                 builder.append("\n");
-                builder.append(indent(visit(body)));
+                builder.append(indent(body.accept(_decoratingVisitor)));
             }
         }
         else {
             builder.append("\n");
             increaseIndentLevel();
-            builder.append(indent(visit(body)));
+            builder.append(indent(body.accept(_decoratingVisitor)));
             decreaseIndentLevel();
         }
 
@@ -1548,7 +1467,7 @@ public class JavaViewer extends LanguageViewer {
 
         for (Node node : nodes) {
             builder.append(
-                    indent("%s\n".formatted(visit(node)))
+                    indent("%s\n".formatted(node.accept(_decoratingVisitor)))
             );
         }
         decreaseIndentLevel();
@@ -1579,7 +1498,7 @@ public class JavaViewer extends LanguageViewer {
 
         StringBuilder builder = new StringBuilder();
         for (Node node : nodes) {
-            builder.append("%s\n".formatted(visit(node)));
+            builder.append("%s\n".formatted(node.accept(_decoratingVisitor)));
         }
 
         return builder.toString();
@@ -1589,7 +1508,7 @@ public class JavaViewer extends LanguageViewer {
         StringBuilder builder = new StringBuilder();
 
         for (var ident : scopedIdent.getScopeResolution()) {
-            builder.append(visit(ident)).append(".");
+            builder.append(ident.accept(_decoratingVisitor)).append(".");
         }
         builder.deleteCharAt(builder.length() - 1); // Удаляем последнюю точку
 
@@ -1599,9 +1518,9 @@ public class JavaViewer extends LanguageViewer {
     public String visit(FunctionCall funcCall) {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(visit(funcCall.getFunction())).append("(");
+        builder.append(funcCall.getFunction().accept(_decoratingVisitor)).append("(");
         for (Expression expr : funcCall.getArguments()) {
-            builder.append(visit(expr)).append(", ");
+            builder.append(expr.accept(_decoratingVisitor)).append(", ");
         }
 
         if (!funcCall.getArguments().isEmpty()) {
@@ -1615,41 +1534,45 @@ public class JavaViewer extends LanguageViewer {
     }
 
     public String visit(WhileLoop whileLoop) {
-        String header = "while (" + visit(whileLoop.getCondition()) + ")";
+        String header = "while (" + whileLoop.getCondition().accept(_decoratingVisitor) + ")";
 
         Statement body = whileLoop.getBody();
         if (body instanceof CompoundStatement compStmt) {
-            return header + (_openBracketOnSameLine ? " " : "\n") + visit(compStmt);
+            return header + (_openBracketOnSameLine ? " " : "\n") + compStmt.accept(_decoratingVisitor);
         }
         else {
             increaseIndentLevel();
-            String result = header + "\n" + indent(visit(body));
+            String result = header + "\n" + indent(body.accept(_decoratingVisitor));
             decreaseIndentLevel();
             return result;
         }
     }
 
     public String visit(PostfixIncrementOp inc) {
-        return visit(inc.getArgument()) + "++";
+        return inc.getArgument().accept(_decoratingVisitor) + "++";
     }
 
     public String visit(PostfixDecrementOp dec) {
-        return visit(dec.getArgument()) + "--";
+        return dec.getArgument().accept(_decoratingVisitor) + "--";
     }
 
     public String visit(PrefixIncrementOp inc) {
-        return "++" + visit(inc.getArgument());
+        return "++" + inc.getArgument().accept(_decoratingVisitor);
     }
 
     public String visit(PrefixDecrementOp dec) {
-        return "--" + visit(dec.getArgument());
+        return "--" + dec.getArgument().accept(_decoratingVisitor);
     }
 
     public String visit(PowOp op) {
-        return "Math.pow(%s, %s)".formatted(visit(op.getLeft()), visit(op.getRight()));
+        return "Math.pow(%s, %s)"
+                .formatted(
+                        op.getLeft().accept(_decoratingVisitor),
+                        op.getRight().accept(_decoratingVisitor)
+                );
     }
 
     public String visit(PackageDeclaration decl) {
-        return "package %s;".formatted(visit(decl.getPackageName()));
+        return "package %s;".formatted(decl.getPackageName().accept(_decoratingVisitor));
     }
 }
