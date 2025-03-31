@@ -59,15 +59,15 @@ import java.util.stream.Collectors;
 public class PythonViewer extends LanguageViewer {
 
     @Override
-    public String toString(Node node) {
+    public String visit(Node node) {
         Tab tab = new Tab();
-        return toString(node, tab);
+        return visit(node, tab);
     }
 
-    public String toString(Tab tab, Node ... nodes) {
+    public String visit(Tab tab, Node ... nodes) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < nodes.length; i++) {
-            builder.append(toString(nodes[i], tab));
+            builder.append(visit(nodes[i], tab));
             if (i != nodes.length - 1) {
                 builder.append("\n");
                 builder.append(tab);
@@ -76,7 +76,7 @@ public class PythonViewer extends LanguageViewer {
         return builder.toString();
     }
 
-    public String toString(Node node, Tab tab) {
+    public String visit(Node node, Tab tab) {
         return switch (node) {
             case ProgramEntryPoint programEntryPoint -> entryPointToString(programEntryPoint, tab);
             case BinaryComparison cmpNode -> comparisonToString(cmpNode);
@@ -87,16 +87,16 @@ public class PythonViewer extends LanguageViewer {
             case CompoundComparison compound -> compoundComparisonToString(compound);
             case Type type -> typeToString(type);
             case Identifier identifier -> identifierToString(identifier);
-            case IndexExpression indexExpr -> String.format("%s[%s]", toString(indexExpr.getExpr()), toString(indexExpr.getIndex()));
-            case MemberAccess memAccess -> String.format("%s.%s", toString(memAccess.getExpression()), toString(memAccess.getMember()));
-            case TernaryOperator ternary -> String.format("%s if %s else %s", toString(ternary.getThenExpr()), toString(ternary.getCondition()), toString(ternary.getElseExpr()));
-            case ParenthesizedExpression paren -> String.format("(%s)", toString(paren.getExpression()));
+            case IndexExpression indexExpr -> String.format("%s[%s]", visit(indexExpr.getExpr()), visit(indexExpr.getIndex()));
+            case MemberAccess memAccess -> String.format("%s.%s", visit(memAccess.getExpression()), visit(memAccess.getMember()));
+            case TernaryOperator ternary -> String.format("%s if %s else %s", visit(ternary.getThenExpr()), visit(ternary.getCondition()), visit(ternary.getElseExpr()));
+            case ParenthesizedExpression paren -> String.format("(%s)", visit(paren.getExpression()));
             case ObjectNewExpression newExpr -> callsToString(newExpr);
             case ArrayNewExpression newExpr -> callsToString(newExpr);
             case FunctionCall funcCall -> callsToString(funcCall);
             case BreakStatement breakStmt -> "break";
-            case DeleteStatement delStmt -> String.format("del %s", toString(delStmt.getTarget()));
-            case DeleteExpression delExpr -> String.format("del %s", toString(delExpr.getTarget()));
+            case DeleteStatement delStmt -> String.format("del %s", visit(delStmt.getTarget()));
+            case DeleteExpression delExpr -> String.format("del %s", visit(delExpr.getTarget()));
             case Range range -> rangeToString(range);
             case ContinueStatement continueStatement -> "continue";
             case Comment comment -> commentToString(comment);
@@ -115,12 +115,12 @@ public class PythonViewer extends LanguageViewer {
             case ClassDefinition classDef -> classToString(classDef, tab);
             case FunctionDeclaration funcDecl -> functionDeclarationToString(funcDecl, tab);
             case Import importStmt -> importToString(importStmt);
-            case ExpressionStatement exprStmt -> toString(exprStmt.getExpression());
+            case ExpressionStatement exprStmt -> visit(exprStmt.getExpression());
             case ReturnStatement returnStmt -> returnToString(returnStmt);
             case ArrayInitializer arrayInit -> arrayInitializerToString(arrayInit);
-            case Include incl -> String.format("import %s", toString(incl.getFileName()));
-            case PackageDeclaration packageDecl -> String.format("import %s", toString(packageDecl.getPackageName()));
-            case ExpressionSequence exprSeq -> String.join(", ", exprSeq.getExpressions().stream().map((Expression nd) -> toString(nd, tab)).toList().toArray(new String[0]));
+            case Include incl -> String.format("import %s", visit(incl.getFileName()));
+            case PackageDeclaration packageDecl -> String.format("import %s", visit(packageDecl.getPackageName()));
+            case ExpressionSequence exprSeq -> String.join(", ", exprSeq.getExpressions().stream().map((Expression nd) -> visit(nd, tab)).toList().toArray(new String[0]));
             case MultipleAssignmentStatement stmtSequence -> assignmentToString(stmtSequence);
             case CastTypeExpression cast -> callsToString(cast);
             case Comprehension compr -> comprehensionToString(compr);
@@ -140,11 +140,11 @@ public class PythonViewer extends LanguageViewer {
         StringBuilder comprehension = new StringBuilder();
         comprehension.append(startBracket);
         if (compr.getItem() instanceof Comprehension.KeyValuePair pair) {
-            comprehension.append(String.format("%s: %s", toString(pair.key()), toString(pair.value())));
+            comprehension.append(String.format("%s: %s", visit(pair.key()), visit(pair.value())));
         } else if (compr.getItem() instanceof Comprehension.SetItem item) {
-            comprehension.append(toString(item.value()));
+            comprehension.append(visit(item.value()));
         } else if (compr.getItem() instanceof Comprehension.ListItem item) {
-            comprehension.append(toString(item.value()));
+            comprehension.append(visit(item.value()));
         } else {
             throw new RuntimeException("Неизвестный тип comprehension");
         }
@@ -155,16 +155,16 @@ public class PythonViewer extends LanguageViewer {
             comprehension.append(
                     String.format(
                             "for %s in %s",
-                            toString(rangeBased.getRangeVariableIdentifier()),
+                            visit(rangeBased.getRangeVariableIdentifier()),
                             rangeFunctionToString(range)
                     )
             );
         } else if (compr instanceof ContainerBasedComprehension containered) {
-            comprehension.append(String.format("for %s in %s", toString(containered.getContainerItemDeclaration()), toString(containered.getContainerExpression())));
+            comprehension.append(String.format("for %s in %s", visit(containered.getContainerItemDeclaration()), visit(containered.getContainerExpression())));
         }
         if (compr.hasCondition()) {
             comprehension.append(' ');
-            comprehension.append(String.format("if %s", toString(compr.getCondition())));
+            comprehension.append(String.format("if %s", visit(compr.getCondition())));
         }
         comprehension.append(endBracket);
         return comprehension.toString();
@@ -172,12 +172,12 @@ public class PythonViewer extends LanguageViewer {
 
     private String returnToString(ReturnStatement returnStmt) {
         Expression expression = returnStmt.getExpression();
-        return (expression != null) ? "return %s".formatted(toString(expression)) : "return";
+        return (expression != null) ? "return %s".formatted(visit(expression)) : "return";
     }
 
     private String identifierToString(Identifier identifier) {
         if (identifier instanceof Alias alias) {
-            return String.format("%s as %s", toString(alias.getRealName()), toString(alias.getAlias()));
+            return String.format("%s as %s", visit(alias.getRealName()), visit(alias.getAlias()));
         } else if (identifier instanceof SelfReference) {
             return "self";
         } else if (identifier instanceof SuperClassReference) {
@@ -195,15 +195,15 @@ public class PythonViewer extends LanguageViewer {
     private String importToString(Import importStmt) {
         if (importStmt instanceof ImportMembers importMembers) {
             if (importMembers.getMembers().isEmpty()) {
-                return String.format("import %s", toString(importStmt.getScope()));
+                return String.format("import %s", visit(importStmt.getScope()));
             } else {
-                return String.format("from %s import %s", toString(importMembers.getScope()),
-                        importMembers.getMembers().stream().map(this::toString).collect(Collectors.joining(", ")));
+                return String.format("from %s import %s", visit(importMembers.getScope()),
+                        importMembers.getMembers().stream().map(this::visit).collect(Collectors.joining(", ")));
             }
         } else if (importStmt instanceof ImportAll) {
-            return String.format("from %s import *", toString(importStmt.getScope()));
+            return String.format("from %s import *", visit(importStmt.getScope()));
         } else {
-            return String.format("import %s", toString(importStmt.getScope()));
+            return String.format("import %s", visit(importStmt.getScope()));
         }
     }
 
@@ -218,16 +218,16 @@ public class PythonViewer extends LanguageViewer {
         StringBuilder builder = new StringBuilder();
         ClassDeclaration decl = (ClassDeclaration) def.getDeclaration();
         if (decl.getParents().isEmpty()) {
-            builder.append(String.format("class %s:\n", toString(decl.getName())));
+            builder.append(String.format("class %s:\n", visit(decl.getName())));
         } else {
-            builder.append(String.format("class %s(%s):\n", toString(decl.getName()), String.join(", ", decl.getParents().stream().map(this::typeToString).toList().toArray(new String[0]))));
+            builder.append(String.format("class %s(%s):\n", visit(decl.getName()), String.join(", ", decl.getParents().stream().map(this::typeToString).toList().toArray(new String[0]))));
         }
-        builder.append(toString(def.getBody(), tab));
+        builder.append(visit(def.getBody(), tab));
         return builder.toString();
     }
 
     private String classDeclToString(ClassDeclaration decl, Tab tab) {
-        return toString(new ClassDefinition(decl, new CompoundStatement(new SymbolEnvironment(null))), tab);
+        return visit(new ClassDefinition(decl, new CompoundStatement(new SymbolEnvironment(null))), tab);
     }
 
     private String functionToString(Definition func, Tab tab) {
@@ -235,13 +235,13 @@ public class PythonViewer extends LanguageViewer {
         FunctionDeclaration decl = (FunctionDeclaration) func.getDeclaration();
         for (Annotation anno : decl.getAnnotations()) {
             if (anno.getArguments().length != 0) {
-                function.append(String.format("@%s(%s)\n%s", toString(anno.getFunctionExpression()), argumentsToString(Arrays.asList(anno.getArguments())), tab));
+                function.append(String.format("@%s(%s)\n%s", visit(anno.getFunctionExpression()), argumentsToString(Arrays.asList(anno.getArguments())), tab));
             } else {
-                function.append(String.format("@%s\n%s", toString(anno.getFunctionExpression()), tab));
+                function.append(String.format("@%s\n%s", visit(anno.getFunctionExpression()), tab));
             }
         }
         function.append("def ");
-        function.append(toString(decl.getName()));
+        function.append(visit(decl.getName()));
         function.append("(");
         if (decl instanceof MethodDeclaration methodDecl && !methodDecl.getModifiers().contains(DeclarationModifier.STATIC)) {
             function.append("self");
@@ -255,7 +255,7 @@ public class PythonViewer extends LanguageViewer {
             if (arg.isListUnpacking()) {
                 function.append('*');
             }
-            function.append(toString(arg.getName()));
+            function.append(visit(arg.getName()));
             if (!(arg.getType() instanceof UnknownType) && arg.getType() != null) {
                 function.append(": ");
                 function.append(typeToString(arg.getType()));
@@ -269,9 +269,9 @@ public class PythonViewer extends LanguageViewer {
         }
         function.append(":\n");
         if (func instanceof MethodDefinition methodDef) {
-            function.append(toString(methodDef.getBody(), tab));
+            function.append(visit(methodDef.getBody(), tab));
         } else if (func instanceof FunctionDefinition funcDef) {
-            function.append(toString(funcDef.getBody(), tab));
+            function.append(visit(funcDef.getBody(), tab));
         }
         return function.toString();
     }
@@ -301,11 +301,11 @@ public class PythonViewer extends LanguageViewer {
             rvalues.add(assignment.getRValue());
         }
         StringBuilder builder = new StringBuilder();
-        builder.append(lvalues.stream().map(this::toString).collect(Collectors.joining(", ")));
+        builder.append(lvalues.stream().map(this::visit).collect(Collectors.joining(", ")));
         builder.append(' ');
         builder.append(operator);
         builder.append(' ');
-        builder.append(rvalues.stream().map(this::toString).collect(Collectors.joining(", ")));
+        builder.append(rvalues.stream().map(this::visit).collect(Collectors.joining(", ")));
         return builder.toString();
     }
 
@@ -347,28 +347,28 @@ public class PythonViewer extends LanguageViewer {
             builder.append(
                     String.format(
                             "for %s in %s:\n",
-                            toString(rangeFor.getIdentifier()),
+                            visit(rangeFor.getIdentifier()),
                             rangeFunctionToString(rangeFor.getRange())
                     )
             );
-            builder.append(toString(rangeFor.getBody(), tab));
+            builder.append(visit(rangeFor.getBody(), tab));
         } else if (stmt instanceof GeneralForLoop generalFor) {
-            return toString(tab, PythonSpecialNodeTransformations.representGeneralFor(generalFor));
+            return visit(tab, PythonSpecialNodeTransformations.representGeneralFor(generalFor));
         } else if (stmt instanceof DoWhileLoop doWhile) {
-            return toString(PythonSpecialNodeTransformations.representDoWhile(doWhile));
+            return visit(PythonSpecialNodeTransformations.representDoWhile(doWhile));
         } else if (stmt instanceof WhileLoop whileLoop) {
-            builder.append(String.format("while %s:\n", toString(whileLoop.getCondition())));
-            builder.append(toString(whileLoop.getBody(), tab));
+            builder.append(String.format("while %s:\n", visit(whileLoop.getCondition())));
+            builder.append(visit(whileLoop.getBody(), tab));
         } else if (stmt instanceof ForEachLoop forEachLoop) {
             List<Expression> identifiers = new ArrayList<>();
             for (VariableDeclarator decl : forEachLoop.getItem().getDeclarators()) {
                 identifiers.add(decl.getIdentifier());
             }
-            builder.append(String.format("for %s in %s:\n", argumentsToString(identifiers), toString(forEachLoop.getExpression())));
-            builder.append(toString(forEachLoop.getBody(), tab));
+            builder.append(String.format("for %s in %s:\n", argumentsToString(identifiers), visit(forEachLoop.getExpression())));
+            builder.append(visit(forEachLoop.getBody(), tab));
         } else if (stmt instanceof SwitchStatement switchStmt) {
             tab = tab.up();
-            builder.append(String.format("match %s:\n", toString(switchStmt.getTargetExpression())));
+            builder.append(String.format("match %s:\n", visit(switchStmt.getTargetExpression())));
             for (CaseBlock caseBranch : switchStmt.getCases()) {
                 if (caseBranch == null) {
                     continue;
@@ -379,8 +379,8 @@ public class PythonViewer extends LanguageViewer {
                                 String.format(
                                         "%scase %s:\n%s\n",
                                         tab,
-                                        toString(basicCaseBlock.getMatchValue()),
-                                        toString(basicCaseBlock.getBody(), tab)
+                                        visit(basicCaseBlock.getMatchValue()),
+                                        visit(basicCaseBlock.getBody(), tab)
                                 )
                         );
                     }
@@ -392,7 +392,7 @@ public class PythonViewer extends LanguageViewer {
                                 String.format(
                                         "%scase _:\n%s\n",
                                         tab,
-                                        toString(defaultCaseBlock.getBody(), tab)
+                                        visit(defaultCaseBlock.getBody(), tab)
                                 )
                         );
                     }
@@ -401,7 +401,7 @@ public class PythonViewer extends LanguageViewer {
             }
         } else if (stmt instanceof InfiniteLoop infLoop) {
             builder.append("while True:\n");
-            builder.append(toString(infLoop.getBody(), tab));
+            builder.append(visit(infLoop.getBody(), tab));
         }
         return builder.toString();
     }
@@ -414,13 +414,13 @@ public class PythonViewer extends LanguageViewer {
         long rValuesCount = Arrays.stream(decls).filter((VariableDeclarator decl) -> decl.hasInitialization() && decl.getRValue() != null).count();
 
         for (int i = 0; i < decls.length; i++) {
-            lValues.append(toString(decls[i].getIdentifier()));
+            lValues.append(visit(decls[i].getIdentifier()));
             //NEED DISCUSSION, see typeToString notes
             if (varDecl.getType() != null && !(varDecl.getType() instanceof UnknownType)) {
                 lValues.append(String.format(": %s", typeToString(varDecl.getType())));
             }
             if (decls[i].hasInitialization() && decls[i].getRValue() != null) {
-                rValues.append(toString(decls[i].getRValue()));
+                rValues.append(visit(decls[i].getRValue()));
             } else if (rValuesCount > 0) {
                 rValues.append("None");
             }
@@ -487,7 +487,7 @@ public class PythonViewer extends LanguageViewer {
     }
 
     private String assignmentExpressionToString(AssignmentExpression expr) {
-        return String.format("%s := %s", toString(expr.getLValue()), toString(expr.getRValue()));
+        return String.format("%s := %s", visit(expr.getLValue()), visit(expr.getRValue()));
     }
 
     private String assignmentToString(AssignmentStatement stmt) {
@@ -507,7 +507,7 @@ public class PythonViewer extends LanguageViewer {
             case POW -> "**=";
             default -> "=";
         };
-        return String.format("%s %s %s", toString(stmt.getLValue()), operator, toString(stmt.getRValue()));
+        return String.format("%s %s %s", visit(stmt.getLValue()), operator, visit(stmt.getRValue()));
     }
 
     private String literalToString(Literal literal) {
@@ -541,7 +541,7 @@ public class PythonViewer extends LanguageViewer {
                         builder.append(simpleString.getEscapedValue());
                     }
                 } else {
-                    builder.append(String.format("{%s}", toString(expr)));
+                    builder.append(String.format("{%s}", visit(expr)));
                 }
             }
             return String.format("%s\"%s\"", prefix, builder);
@@ -564,7 +564,7 @@ public class PythonViewer extends LanguageViewer {
             StringBuilder builder = new StringBuilder();
             builder.append('{');
             for (Expression key : map.keySet()) {
-                builder.append(String.format("%s: %s, ", toString(key), toString(map.get(key))));
+                builder.append(String.format("%s: %s, ", visit(key), visit(map.get(key))));
             }
             builder.setCharAt(builder.length() - 2, '}');
             builder.setLength(builder.length() - 1);
@@ -590,15 +590,15 @@ public class PythonViewer extends LanguageViewer {
 
         String[] parts = new String[] {"", "", ""};
         if (start != null) {
-            parts[0] = toString(start).concat(":");
+            parts[0] = visit(start).concat(":");
         }
 
         if (stop != null) {
-            parts[1] = toString(stop);
+            parts[1] = visit(stop);
         }
 
         if (step != null) {
-            parts[2] = ":".concat(toString(step));
+            parts[2] = ":".concat(visit(step));
         }
 
         if (parts[0].isEmpty() && !parts[1].isEmpty() && !parts[2].isEmpty()) {
@@ -625,16 +625,16 @@ public class PythonViewer extends LanguageViewer {
         }
 
         if ((start == null || isStartDefault) && (step == null || isStepDefault)) {
-            return String.format("range(%s)", toString(stop));
+            return String.format("range(%s)", visit(stop));
         } else if (start != null && (step == null || isStepDefault)) {
-            return String.format("range(%s, %s)", toString(start), toString(stop));
+            return String.format("range(%s, %s)", visit(start), visit(stop));
         }
 
         if (start == null || isStartDefault) {
             start = new IntegerLiteral(0);
         }
 
-        return String.format("range(%s, %s, %s)", toString(start), toString(stop), toString(step));
+        return String.format("range(%s, %s, %s)", visit(start), visit(stop), visit(step));
     }
 
     private String binaryOpToString(BinaryExpression node) {
@@ -673,14 +673,14 @@ public class PythonViewer extends LanguageViewer {
         } else if (node instanceof ShortCircuitOrOp) {
             pattern = "%s or %s";
         }
-        return String.format(pattern, toString(node.getLeft()), toString(node.getRight()));
+        return String.format(pattern, visit(node.getLeft()), visit(node.getRight()));
     }
 
     private String preferExplicitAndOpToString(Node node) {
         if (node instanceof ShortCircuitAndOp op) {
             return String.format("%s and %s", preferExplicitAndOpToString(op.getLeft()), preferExplicitAndOpToString(op.getRight()));
         } else {
-            return toString(node);
+            return visit(node);
         }
     }
 
@@ -692,7 +692,7 @@ public class PythonViewer extends LanguageViewer {
                 } else {
                     Shape shape = newExpr.getShape();
                     String result = _getListComprehensionByDimension(1,
-                            shape.getDimension(shape.getDimensionCount() - 1), String.format("%s()", toString(newExpr.getType())));
+                            shape.getDimension(shape.getDimensionCount() - 1), String.format("%s()", visit(newExpr.getType())));
                     for (int i = shape.getDimensionCount() - 2; i >= 0; i--) {
                         result = _getListComprehensionByDimension(shape.getDimensionCount() - i, shape.getDimension(i), result);
                     }
@@ -700,13 +700,13 @@ public class PythonViewer extends LanguageViewer {
                 }
             }
             case ObjectNewExpression newExpr -> {
-                return String.format("%s(%s)", toString(newExpr.getType()), argumentsToString(newExpr.getConstructorArguments()));
+                return String.format("%s(%s)", visit(newExpr.getType()), argumentsToString(newExpr.getConstructorArguments()));
             }
             case FunctionCall funcCall -> {
-                return String.format("%s(%s)", toString(PythonSpecificFeatures.getFunctionExpression(funcCall)), argumentsToString(funcCall.getArguments()));
+                return String.format("%s(%s)", visit(PythonSpecificFeatures.getFunctionExpression(funcCall)), argumentsToString(funcCall.getArguments()));
             }
             case CastTypeExpression cast -> {
-                return String.format("%s(%s)", toString(cast.getCastType()), toString(cast.getValue()));
+                return String.format("%s(%s)", visit(cast.getCastType()), visit(cast.getValue()));
             }
             case null, default -> throw new RuntimeException("Not a callable object");
         }
@@ -723,7 +723,7 @@ public class PythonViewer extends LanguageViewer {
     private String argumentsToString(List<Expression> expressions) {
         String[] exprStrings = new String[expressions.size()];
         for (int i = 0; i < exprStrings.length; i++) {
-            exprStrings[i] = toString(expressions.get(i));
+            exprStrings[i] = visit(expressions.get(i));
         }
         return String.join(", ", exprStrings);
     }
@@ -733,13 +733,13 @@ public class PythonViewer extends LanguageViewer {
         for (int i = 0; i < node.getBranches().size(); i++) {
             ConditionBranch branch = node.getBranches().get(i);
             if (i == 0) {
-                sb.append(String.format("if %s:\n%s\n", toString(branch.getCondition()), toString(branch.getBody(), tab)));
+                sb.append(String.format("if %s:\n%s\n", visit(branch.getCondition()), visit(branch.getBody(), tab)));
             } else {
-                sb.append(String.format("%selif %s:\n%s\n", tab, toString(branch.getCondition()), toString(branch.getBody(), tab)));
+                sb.append(String.format("%selif %s:\n%s\n", tab, visit(branch.getCondition()), visit(branch.getBody(), tab)));
             }
         }
         if (node.hasElseBranch()) {
-            sb.append(String.format("%selse:\n%s\n", tab, toString(node.getElseBranch(), tab)));
+            sb.append(String.format("%selse:\n%s\n", tab, visit(node.getElseBranch(), tab)));
         }
         return sb.toString().stripTrailing();
     }
@@ -759,9 +759,9 @@ public class PythonViewer extends LanguageViewer {
         } else if (node instanceof PostfixIncrementOp || node instanceof PrefixIncrementOp) {
             pattern = "%s += 1";
         } else if (node instanceof PointerPackOp || node instanceof PointerUnpackOp) {
-            return toString(node.getArgument());
+            return visit(node.getArgument());
         }
-        return String.format(pattern, toString(node.getArgument()));
+        return String.format(pattern, visit(node.getArgument()));
     }
 
     private String blockToString(CompoundStatement node, Tab tab) {
@@ -774,9 +774,9 @@ public class PythonViewer extends LanguageViewer {
             builder.append(tab);
             if (child instanceof CompoundStatement) {
                 // Схлопываем лишний таб, так как блоки как самостоятельная сущность в Python не поддерживаются
-                builder.append(toString(child, tab.down().down()));
+                builder.append(visit(child, tab.down().down()));
             } else {
-                builder.append(toString(child, tab));
+                builder.append(visit(child, tab));
             }
             builder.append('\n');
         }
@@ -792,9 +792,9 @@ public class PythonViewer extends LanguageViewer {
             builder.append(tab);
             if (child instanceof CompoundStatement) {
                 // Схлопываем лишний таб, так как блоки как самостоятельная сущность в Python не поддерживаются
-                builder.append(toString(child, tab.down().down()));
+                builder.append(visit(child, tab.down().down()));
             } else {
-                builder.append(toString(child, tab));
+                builder.append(visit(child, tab));
             }
             builder.append('\n');
         }
@@ -816,12 +816,12 @@ public class PythonViewer extends LanguageViewer {
         } else if (node instanceof LtOp) {
             pattern = "%s < %s";
         }
-        return String.format(pattern, toString(node.getLeft()), toString(node.getRight()));
+        return String.format(pattern, visit(node.getLeft()), visit(node.getRight()));
     }
 
     private String compoundComparisonToString(CompoundComparison node) {
         StringBuilder sb = new StringBuilder();
-        sb.append(toString(node.getComparisons().getFirst().getLeft()));
+        sb.append(visit(node.getComparisons().getFirst().getLeft()));
         for (BinaryComparison cmp : node.getComparisons()) {
             if (cmp instanceof EqOp) {
                 sb.append(" == ");
@@ -836,7 +836,7 @@ public class PythonViewer extends LanguageViewer {
             } else if (cmp instanceof LtOp) {
                 sb.append(" < ");
             }
-            sb.append(toString(cmp.getRight()));
+            sb.append(visit(cmp.getRight()));
         }
         return sb.toString();
     }

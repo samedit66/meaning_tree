@@ -5,7 +5,6 @@ import org.vstu.meaningtree.languages.configs.ConfigParameter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 public abstract class LanguageTranslator {
@@ -50,7 +49,7 @@ public abstract class LanguageTranslator {
     }
 
     public String getCode(MeaningTree mt) {
-        return _viewer.toString(mt);
+        return _viewer.visit(mt);
     }
 
     public ConfigParameter getConfigParameter(String name) {

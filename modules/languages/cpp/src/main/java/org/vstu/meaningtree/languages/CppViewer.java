@@ -55,13 +55,13 @@ public class CppViewer extends LanguageViewer {
 
     @NotNull
     @Override
-    public String toString(@NotNull MeaningTree meaningTree) {
-        return toString(meaningTree.getRootNode());
+    public String visit(@NotNull MeaningTree meaningTree) {
+        return visit(meaningTree.getRootNode());
     }
 
     @NotNull
     @Override
-    public String toString(@NotNull Node node) {
+    public String visit(@NotNull Node node) {
         return switch (node) {
             case ProgramEntryPoint entryPoint -> toStringEntryPoint(entryPoint);
             case VariableDeclarator variableDeclarator -> toStringVariableDeclarator(variableDeclarator);
@@ -96,7 +96,7 @@ public class CppViewer extends LanguageViewer {
 
     private String toStringMemberAccess(MemberAccess memAccess) {
         String token = memAccess instanceof PointerMemberAccess ? "->" : ".";
-        return String.format("%s%s%s",toString(memAccess.getExpression()), token, toString(memAccess.getMember()));
+        return String.format("%s%s%s", visit(memAccess.getExpression()), token, visit(memAccess.getMember()));
     }
 
     private String fromInterpolatedString(InterpolatedStringLiteral interpolatedStringLiteral) {
@@ -125,14 +125,14 @@ public class CppViewer extends LanguageViewer {
             builder.append("[]");
         }
         builder.append(' ');
-        builder.append(toString(del.getTarget()));
+        builder.append(visit(del.getTarget()));
         return builder.toString();
     }
 
     private String toStringNew(NewExpression _new) {
         if (_new instanceof ArrayNewExpression arrayNew) {
             StringBuilder newBuilder = new StringBuilder("new ");
-            newBuilder.append(toString(arrayNew.getType()));
+            newBuilder.append(visit(arrayNew.getType()));
             for (int i = 0; i < arrayNew.getShape().getDimensionCount(); i++) {
                 newBuilder.append(String.format("[%s]", arrayNew.getShape().getDimension(i)));
             }
@@ -142,20 +142,20 @@ public class CppViewer extends LanguageViewer {
             }
             return newBuilder.toString();
         } else if (_new instanceof PlacementNewExpression placementNew) {
-            return String.format("new(%s) %s", toStringArguments(placementNew.getConstructorArguments()), toString(placementNew.getType()));
+            return String.format("new(%s) %s", toStringArguments(placementNew.getConstructorArguments()), visit(placementNew.getType()));
         } else if (_new instanceof ObjectNewExpression objectNew) {
-            return String.format("new %s(%s)", toString(objectNew.getType()), toStringArguments(objectNew.getConstructorArguments()));
+            return String.format("new %s(%s)", visit(objectNew.getType()), toStringArguments(objectNew.getConstructorArguments()));
         } else {
             throw new RuntimeException("Unknown new expression");
         }
     }
 
     private String toStringSizeof(SizeofExpression sizeof) {
-        return String.format("sizeof(%s)", toString(sizeof.getExpression()));
+        return String.format("sizeof(%s)", visit(sizeof.getExpression()));
     }
 
     private String toStringCast(CastTypeExpression cast) {
-        return String.format("(%s)%s", toString(cast.getCastType()), toString(cast.getValue()));
+        return String.format("(%s)%s", visit(cast.getCastType()), visit(cast.getValue()));
     }
 
     private String toStringCollectionLiteral(PlainCollectionLiteral colLit) {
@@ -163,7 +163,7 @@ public class CppViewer extends LanguageViewer {
     }
 
     private String toStringArguments(List<Expression> exprs) {
-        return String.join(", ", exprs.stream().map(this::toString).toList());
+        return String.join(", ", exprs.stream().map(this::visit).toList());
     }
 
     private String toStringStringLiteral(StringLiteral literal) {
@@ -171,14 +171,14 @@ public class CppViewer extends LanguageViewer {
     }
 
     private String toStringFloorDiv(FloorDivOp op) {
-        return String.format("(int)(%s / %s)", toString(op.getLeft()), toString(op.getRight()));
+        return String.format("(int)(%s / %s)", visit(op.getLeft()), visit(op.getRight()));
     }
 
     private String toStringEntryPoint(ProgramEntryPoint entryPoint) {
         // TODO: required main function creation or expression mode
         StringBuilder builder = new StringBuilder();
         for (Node node : entryPoint.getBody()) {
-            builder.append(toString(node));
+            builder.append(visit(node));
             builder.append("\n");
         }
         return builder.toString();
@@ -186,19 +186,19 @@ public class CppViewer extends LanguageViewer {
 
     @NotNull
     private String toStringExpressionStatement(@NotNull ExpressionStatement expressionStatement) {
-        return toString(expressionStatement.getExpression()) + ";";
+        return visit(expressionStatement.getExpression()) + ";";
     }
 
     @NotNull
     private String toStringVariableDeclarator(@NotNull VariableDeclarator variableDeclarator) {
-        String variableName = toString(variableDeclarator.getIdentifier());
+        String variableName = visit(variableDeclarator.getIdentifier());
 
         Expression rValue = variableDeclarator.getRValue();
         if (rValue == null) {
             return variableName;
         }
 
-        return "%s = %s".formatted(variableName, toString(rValue));
+        return "%s = %s".formatted(variableName, visit(rValue));
     }
 
     @NotNull
@@ -206,13 +206,13 @@ public class CppViewer extends LanguageViewer {
         StringBuilder builder = new StringBuilder();
 
         Type declarationType = variableDeclaration.getType();
-        String type = toString(declarationType);
+        String type = visit(declarationType);
         builder
                 .append(type)
                 .append(" ");
 
         for (VariableDeclarator variableDeclarator : variableDeclaration.getDeclarators()) {
-            builder.append(toString(variableDeclarator)).append(", ");
+            builder.append(visit(variableDeclarator)).append(", ");
         }
         // Чтобы избежать лишней головной боли на проверки "а последняя ли это декларация",
         // я автоматически после каждой декларации добавляю запятую и пробел,
@@ -227,8 +227,8 @@ public class CppViewer extends LanguageViewer {
 
     @NotNull
     private String toStringIndexExpression(@NotNull IndexExpression indexExpression) {
-        String base = toString(indexExpression.getExpr());
-        String indices = toString(indexExpression.getIndex());
+        String base = visit(indexExpression.getExpr());
+        String indices = visit(indexExpression.getIndex());
         return "%s[%s]".formatted(base, indices);
     }
 
@@ -238,7 +238,7 @@ public class CppViewer extends LanguageViewer {
 
         for (Expression expression : commaExpression.getExpressions()) {
             builder
-                    .append(toString(expression))
+                    .append(visit(expression))
                     .append(", ");
         }
 
@@ -252,9 +252,9 @@ public class CppViewer extends LanguageViewer {
 
     @NotNull
     private String toStringTernaryOperator(@NotNull TernaryOperator ternaryOperator) {
-        String condition = toString(ternaryOperator.getCondition());
-        String then = toString(ternaryOperator.getThenExpr());
-        String else_ = toString(ternaryOperator.getElseExpr());
+        String condition = visit(ternaryOperator.getCondition());
+        String then = visit(ternaryOperator.getThenExpr());
+        String else_ = visit(ternaryOperator.getElseExpr());
         return "%s ? %s : %s".formatted(condition, then, else_);
     }
 
@@ -266,7 +266,7 @@ public class CppViewer extends LanguageViewer {
 
         for (Expression argument : arguments) {
             builder
-                    .append(toString(argument))
+                    .append(visit(argument))
                     .append(", ");
         }
 
@@ -282,20 +282,20 @@ public class CppViewer extends LanguageViewer {
 
     @NotNull
     private String toStringFunctionCall(@NotNull FunctionCall functionCall) {
-        String functionName = toString(functionCall.getFunction());
+        String functionName = visit(functionCall.getFunction());
         return functionName + toStringFunctionCallArgumentsList(functionCall.getArguments());
     }
 
     @NotNull
     private String toStringParenthesizedExpression(@NotNull ParenthesizedExpression parenthesizedExpression) {
-        return "(" + toString(parenthesizedExpression.getExpression()) + ")";
+        return "(" + visit(parenthesizedExpression.getExpression()) + ")";
     }
 
     @NotNull
     private String toStringAssignmentExpression(@NotNull AssignmentExpression assignmentExpression) {
         AugmentedAssignmentOperator op = assignmentExpression.getAugmentedOperator();
-        String l = toString(assignmentExpression.getLValue());
-        String r = toString(assignmentExpression.getRValue());
+        String l = visit(assignmentExpression.getLValue());
+        String r = visit(assignmentExpression.getRValue());
 
         // В С++ нет встроенного оператора возведения в степень, поэтому
         // используем функцию, необходимо убедится что подключен файл cmath: #include <cmath>
@@ -411,8 +411,8 @@ public class CppViewer extends LanguageViewer {
             case ArrayType array ->  String.format("std::array<%s>", toStringType(array.getItemType()));
             case SetType set ->  String.format("std::set<%s>", toStringType(set.getItemType()));
             case StringType str -> "std::string"; // TODO: пока нет способа хорошо представить юникод-строки
-            case GenericUserType gusr -> String.format("%s<%s>", toString(gusr.getQualifiedName()), toStringArguments(List.of(gusr.getTypeParameters())));
-            case UserType usr -> toString(usr.getQualifiedName());
+            case GenericUserType gusr -> String.format("%s<%s>", visit(gusr.getQualifiedName()), toStringArguments(List.of(gusr.getTypeParameters())));
+            case UserType usr -> visit(usr.getQualifiedName());
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
         if (type.isConst() && !(type instanceof ReferenceType) && !(type instanceof PointerType)) {
@@ -456,10 +456,10 @@ public class CppViewer extends LanguageViewer {
 
         if (unaryExpression instanceof PostfixDecrementOp
                 || unaryExpression instanceof PostfixIncrementOp) {
-            return toString(unaryExpression.getArgument()) + operator;
+            return visit(unaryExpression.getArgument()) + operator;
         }
 
-        return operator + toString(unaryExpression.getArgument());
+        return operator + visit(unaryExpression.getArgument());
     }
 
     @NotNull
@@ -488,9 +488,9 @@ public class CppViewer extends LanguageViewer {
         };
 
         return "%s %s %s".formatted(
-                toString(binaryExpression.getLeft()),
+                visit(binaryExpression.getLeft()),
                 operator,
-                toString(binaryExpression.getRight())
+                visit(binaryExpression.getRight())
         );
     }
 }
