@@ -118,5 +118,3 @@ public JavaViewer(LanguageTokenizer tokenizer)
 ## Ограничения
 
 - Нет автоматического вывода generics.
-
-- Ограниченная проверка типов (Hindley-Milner отключен).
