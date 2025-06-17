@@ -109,23 +109,6 @@ MeaningTree meaningTree = cppLanguage.getMeaningTree("int main() { int a = 10; }
 
 ## Основные возможности
 
-- **Конфигурируемые параметры форматирования**
-  - отступы (количество пробелов или символ табуляции);
-  - расположение открывающей скобки (`{`) — на той же строке или на следующей;
-  - оборачивание веток `case` в дополнительные скобки;
-  - автоматическое объявление переменных при инициализации.
-
-- **Поддержка полного набора узлов `MeaningTree`**
-  - выражения (`BinaryExpression`, `UnaryExpression`, `TernaryOperator` и др.);
-  - операторы управления (`IfStatement`, `WhileLoop`, `SwitchStatement`, `ForLoop` и др.);
-  - литералы и идентификаторы (`NumericLiteral`, `StringLiteral`, `Identifier` и др.);
-  - функции и их объявления/определения (`FunctionDeclaration`, `FunctionDefinition`);
-  - операции `new`/`delete`, работа с коллекциями и многое другое.
-
-- **Автоматическое управление отступами**
-  - вложенность блоков увеличивается/уменьшается автоматически;
-  - гарантируется, что уровень отступа не станет отрицательным.
-
 - **Использование:**
 ```java
 LanguageViewer cppViewer = new CppViewer();
@@ -158,6 +141,8 @@ public CppViewer(LanguageTokenizer tokenizer)
 | `bracketsAroundCaseBranches`   | `true` — всегда оборачивать содержимое `case` в `{…}`; `false` — только при объявлении переменных|
 | `autoVariableDeclaration`      | `true` — при первом присваивании автоматически генерировать `type name = …;`                      |
 
+> TODO:
+> Перенести в configs. 
 ---
 
 ## Управление отступами
@@ -173,21 +158,51 @@ public CppViewer(LanguageTokenizer tokenizer)
 
 ## Поддерживаемые конструкции
 
-| Категория                       | Узлы                                      |
-|---------------------------------|-------------------------------------------|
-| **Вход/вывод**                  | `InputCommand` (std::cin), `PrintCommand` |
-| **Управление потоком**          | `IfStatement`, `SwitchStatement`, `ReturnStatement`, `BreakStatement`, `ContinueStatement` |
-| **Циклы**                       | `WhileLoop`, `InfiniteLoop`, `RangeForLoop`, `GeneralForLoop` |
-| **Операции работы с памятью**   | `MemoryAllocationCall (new)`, `MemoryFreeCall (delete)` |
-| **Выражения**                   | `BinaryExpression`, `UnaryExpression`, `TernaryOperator`, `AssignmentExpression`, `CastTypeExpression`, `SizeofExpression` |
-| **Коллекции и литералы**        | `PlainCollectionLiteral`, `DictionaryLiteral`, `ArrayInitializer` |
-
----
-
-## Ограничения
-
-- Не поддерживается локализация (все ключевые слова на английском).
-- Не обрабатываются все расширения C++ (ограниченная поддержка шаблонов).
-- Нет автоматического разрешения имен (scope analysis отсутствует).
-- Авто‑декларация переменных работает только для простых случаев и может потребовать ручной корректировки.
-
+- **ProgramEntryPoint**
+- **ExpressionStatement**
+- **VariableDeclaration**
+- **IndexExpression**
+- **ExpressionSequence** (комма‑выражение)
+- **TernaryOperator**
+- **MemoryAllocationCall**
+- **MemoryFreeCall**
+- **InputCommand**
+  - _включая подклассы `FormatInput`_
+- **PrintCommand**
+  - _включая подклассы `FormatPrint` и `PrintValues`_
+- **FunctionCall**
+  - _включая `MethodCall`_
+- **ParenthesizedExpression**
+- **AssignmentExpression**
+- **AssignmentStatement**
+- **Type** (все реализации: `IntType`, `FloatType`, `CharacterType`, `BooleanType`, `NoReturn`, `UnknownType`, `PointerType`, `ReferenceType`, `DictionaryType`, `ArrayType`, `UnmodifiableListType`, `SetType`, `PlainCollectionType`, `StringType`, `GenericUserType`, `UserType`)
+- **Identifier**
+  - _включая `SimpleIdentifier`, `ScopedIdentifier`, `QualifiedIdentifier`_
+- **NumericLiteral**
+  - _включая `IntegerLiteral`, `FloatLiteral`_
+- **FloorDivOp**
+- **UnaryExpression**
+  - _включая `NotOp`, `InversionOp`, `UnaryMinusOp`, `UnaryPlusOp`, `PostfixIncrementOp`, `PrefixIncrementOp`, `PostfixDecrementOp`, `PrefixDecrementOp`, `PointerPackOp`, `PointerUnpackOp`_
+- **BinaryExpression**
+  - _включая арифметические, логические, битовые, сравнительные операции, `PowOp`, `MatMulOp`, `ContainsOp`, `ReferenceEqOp`, `InstanceOfOp`, `FloorDivOp`_
+- **NullLiteral**
+- **StringLiteral**
+- **CharacterLiteral**
+- **BoolLiteral**
+- **PlainCollectionLiteral**
+- **DictionaryLiteral**
+- **CastTypeExpression**
+- **SizeofExpression**
+- **NewExpression**
+  - `ArrayNewExpression`
+  - `PlacementNewExpression`
+  - `ObjectNewExpression`
+- **DeleteExpression**
+- **DeleteStatement**
+- **MemberAccess**
+  - _включая `PointerMemberAccess`_
+- **CompoundComparison**
+- **DefinitionArgument**
+- **Comment**
+- **InterpolatedStringLiteral**
+- **MultipleAssignmentStatement**

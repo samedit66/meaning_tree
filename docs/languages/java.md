@@ -69,28 +69,112 @@ MeaningTree meaningTree = javaLanguage.getMeaningTree("String a = \"Hello, world
 - `WhileStatement`
 
 
-## Текущие ограничения
-
-- **Нет значений по умолчанию** для параметров (всегда `null`).
-
-- **Отсутствие полноценной таблицы символов** и разрешения имён (scope).
-
-- **Пока не поддерживаются аннотации** (annotations всегда пуст).
-
-- **Частичная поддержка пользовательских типов**.
-
 # JavaViewer
 
 Класс `JavaViewer` выполняет преобразование внутреннего дерева (`MeaningTree`) в корректно отформатированный Java‑код с учётом заданных параметров стиля.
 
-## Основные возможности
+## Поддерживаемые классы
+- `ListLiteral`
+- `SetLiteral`
+- `DictionaryLiteral`
+- `PlainCollectionLiteral`
+- `InterpolatedStringLiteral`
+- `FloatLiteral`
+- `IntegerLiteral`
+- `QualifiedIdentifier`
+- `StringLiteral`
+- `UserType`
+- `ReferenceType`
+- `PointerType`
+- `MemoryAllocationCall`
+- `MemoryFreeCall`
+- `Type`
+- `SelfReference`
+- `UnaryMinusOp`
+- `UnaryPlusOp`
+- `AddOp`
+- `SubOp`
+- `MulOp`
+- `DivOp`
+- `ModOp`
+- `MatMulOp`
+- `FloorDivOp`
+- `EqOp`
+- `GeOp`
+- `GtOp`
+- `LeOp`
+- `LtOp`
+- `InstanceOfOp`
+- `NotEqOp`
+- `ShortCircuitAndOp`
+- `ShortCircuitOrOp`
+- `NotOp`
+- `ParenthesizedExpression`
+- `AssignmentExpression`
+- `AssignmentStatement`
+- `FieldDeclaration`
+- `VariableDeclaration`
+- `CompoundStatement`
+- `ExpressionStatement`
+- `SimpleIdentifier`
+- `IfStatement`
+- `GeneralForLoop`
+- `CompoundComparison`
+- `RangeForLoop`
+- `ProgramEntryPoint`
+- `MethodCall`
+- `FormatPrint`
+- `PrintValues`
+- `FunctionCall`
+- `WhileLoop`
+- `ScopedIdentifier`
+- `PostfixIncrementOp`
+- `PostfixDecrementOp`
+- `PrefixIncrementOp`
+- `PrefixDecrementOp`
+- `PowOp`
+- `PackageDeclaration`
+- `ClassDeclaration`
+- `ClassDefinition`
+- `Comment`
+- `BreakStatement`
+- `ContinueStatement`
+- `ObjectConstructorDefinition`
+- `MethodDefinition`
+- `SwitchStatement`
+- `NullLiteral`
+- `StaticImportAll`
+- `StaticImportMembers`
+- `ImportAll`
+- `ImportMembers`
+- `ObjectNewExpression`
+- `BoolLiteral`
+- `MemberAccess`
+- `ArrayNewExpression`
+- `ArrayInitializer`
+- `ReturnStatement`
+- `CastTypeExpression`
+- `IndexExpression`
+- `TernaryOperator`
+- `BitwiseAndOp`
+- `BitwiseOrOp`
+- `XorOp`
+- `InversionOp`
+- `LeftShiftOp`
+- `RightShiftOp`
+- `MultipleAssignmentStatement`
+- `InfiniteLoop`
+- `ExpressionSequence`
+- `CharacterLiteral`
+- `DoWhileLoop`
+- `PointerPackOp`
+- `DefinitionArgument`
+- `PointerUnpackOp`
+- `ContainsOp`
+- `ReferenceEqOp`
 
-- **Конфигурируемые параметры форматирования**
-  - `indentSpaceCount`, `openBracketOnSameLine`, `bracketsAroundCaseBranches`, `autoVariableDeclaration`
 
-- **Поддержка полного набора узлов `MeaningTree` через метод `toString(Node node)` и `switch`.**
-
-- **Использование:**
+**Использование:**
 ```java
 LanguageViewer javaViewer = new JavaViewer();
 String code = javaViewer.toString(meaningTree);
@@ -114,7 +198,12 @@ public JavaViewer(
 public JavaViewer(LanguageTokenizer tokenizer)
 ```
 
+| Параметр                       | Описание                                                                                         |
+|--------------------------------|--------------------------------------------------------------------------------------------------|
+| `indentSpaceCount`             | сколько пробелов использовать для одного уровня вложенности (`" ".repeat(indentSpaceCount)`)     |
+| `openBracketOnSameLine`        | `true` — `{` сразу после заголовка блока; `false` — на новой строке с отступом                   |
+| `bracketsAroundCaseBranches`   | `true` — всегда оборачивать содержимое `case` в `{…}`; `false` — только при объявлении переменных|
+| `autoVariableDeclaration`      | `true` — при первом присваивании автоматически генерировать `type name = …;`                      |
 
-## Ограничения
-
-- Нет автоматического вывода generics.
+> TODO:
+> Перенести в configs. 

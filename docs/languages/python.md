@@ -70,16 +70,6 @@ MeaningTree meaningTree = pythonLanguage.getMeaningTree("a = 10");
 - `WhileStatement`
 
 
-## Текущие ограничения
-
-- Нет поддержки аннотаций и типов по умолчанию.
-
-- Отсутствует полная таблица символов (Scope).
-
-- Не обрабатываются некоторые конструкции Python (например, f-строки могут требовать доп. обработки).
-
-- Ограниченная проверка типов во вьювере.
-
 # PythonViewer
 
 Класс `PythonViewer` выполняет преобразование дерева `MeaningTree` в корректно отформатированный Python‑код.
@@ -161,23 +151,3 @@ String code = pythonViewer.toString(meaningTree);
 - Форматирование пользовательских генераторов и comprehensions может быть упрощено.
 
 - Поддержка условных выражений и логических операторов базовая.
-
-# PythonTranslator
-
-Класс `PythonTranslator` связывает парсер и вьювер для Python; отвечает за подготовку кода и конфигурации.
-
-## Основные возможности
-
-- **Идентификатор языка**: `public int getLanguageId()` возвращает `1`.
-
-- **Токенизатор**: `public LanguageTokenizer getTokenizer()`.
-
-- **Подготовка кода**: `prepareCode` оставляет код без изменений.
-
-- **Конфигурация**: `getDeclaredConfig` устанавливает `DisableCompoundComparisonConversion`.
-
-
-
-## Текущие ограничения
-
-- Нет поддержки настройки expressionMode.
