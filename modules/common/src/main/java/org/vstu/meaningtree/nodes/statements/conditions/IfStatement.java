@@ -89,9 +89,9 @@ public class IfStatement extends Statement {
         return builder.toString();
     }
 
-    public void makeCompoundBranches(SymbolEnvironment env) {
+    public void makeCompoundBranches() {
         for (ConditionBranch branch : branches) {
-            branch.makeCompoundBody(env);
+            branch.makeCompoundBody();
         }
     }
 }

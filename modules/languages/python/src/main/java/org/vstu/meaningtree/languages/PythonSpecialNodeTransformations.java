@@ -100,7 +100,7 @@ public class PythonSpecialNodeTransformations {
             if (node instanceof ForLoop || node instanceof WhileLoop) {
                 return;
             } else if (node instanceof IfStatement ifStmt) {
-                ifStmt.makeCompoundBranches(compound.getEnv());
+                ifStmt.makeCompoundBranches();
                 for (ConditionBranch branch : ifStmt.getBranches()) {
                     _prepend_continue_with_expression((CompoundStatement) branch.getBody(), update);
                 }
@@ -109,7 +109,7 @@ public class PythonSpecialNodeTransformations {
                 }
             } else if (node instanceof SwitchStatement switchStmt) {
                 //TODO: it is correct (continue usage) in programming languages?
-                switchStmt.makeCompoundBranches(compound.getEnv());
+                switchStmt.makeCompoundBranches();
                 for (CaseBlock branch : switchStmt.getCases()) {
                     _prepend_continue_with_expression((CompoundStatement) branch.getBody(), update);
                 }
@@ -117,7 +117,7 @@ public class PythonSpecialNodeTransformations {
                     _prepend_continue_with_expression((CompoundStatement) switchStmt.getDefaultCase().getBody(), update);
                 }
             } else if (node instanceof HasBodyStatement hasBodyStmt) {
-                hasBodyStmt.makeCompoundBody(compound.getEnv());
+                hasBodyStmt.makeCompoundBody();
                 _prepend_continue_with_expression((CompoundStatement) hasBodyStmt.getBody(), update);
             }
         }
@@ -132,16 +132,14 @@ public class PythonSpecialNodeTransformations {
         }
         IfStatement breakCondition = new IfStatement(condition, new BreakStatement(), null);
         List<Node> body;
-        SymbolEnvironment env = null;
         if (doWhile.getBody() instanceof CompoundStatement compound) {
-            env = compound.getEnv();
             body = new ArrayList<>(List.of(compound.getNodes()));
         } else {
             body = new ArrayList<>();
             body.add(doWhile.getBody());
         }
         body.add(breakCondition);
-        return new WhileLoop(new BoolLiteral(true), new CompoundStatement(env, body));
+        return new WhileLoop(new BoolLiteral(true), new CompoundStatement(body));
     }
 
     public static Node detectCompoundComparison(Node expressionNode) {

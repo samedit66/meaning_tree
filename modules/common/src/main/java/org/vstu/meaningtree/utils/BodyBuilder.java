@@ -34,7 +34,7 @@ public class BodyBuilder {
 
     public BodyBuilder(CompoundStatement compound) {
         _nodes = new ArrayList<>(List.of(compound.getNodes()));
-        _env = compound.getEnv();
+        _env = null;
     }
 
     public BodyBuilder() {
@@ -48,9 +48,6 @@ public class BodyBuilder {
     public void put(Node node) {
         int position = _nodes.size();
         if (node instanceof CompoundStatement compound) {
-            if (!compound.getEnv().equals(getEnv())) {
-                throw new MeaningTreeException("Compound statement belongs to other symbol env");
-            }
             _env.putNestedScope((HasSymbolScope) node, position);
         } else if (node instanceof VariableDeclaration declaration) {
             for (VariableDeclarator v : declaration.getDeclarators()) {
@@ -134,7 +131,7 @@ public class BodyBuilder {
     public Node getAt(int index) { return _nodes.get(index); }
 
     public CompoundStatement build() {
-        return new CompoundStatement(_env, _nodes);
+        return new CompoundStatement(_nodes);
     }
 
     public int getCurrentLength() {

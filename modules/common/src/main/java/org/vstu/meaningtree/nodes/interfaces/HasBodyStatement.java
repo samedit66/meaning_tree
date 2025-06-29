@@ -12,5 +12,5 @@ public interface HasBodyStatement {
         return getBody() instanceof CompoundStatement;
     }
 
-    CompoundStatement makeCompoundBody(SymbolEnvironment env);
+    CompoundStatement makeCompoundBody();
 }

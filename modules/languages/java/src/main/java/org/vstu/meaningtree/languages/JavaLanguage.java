@@ -602,17 +602,17 @@ public class JavaLanguage extends LanguageParser {
             else {
                 Identifier scope = fromIdentifierTSNode(scopeNode.getChildByFieldName("scope"));
                 Identifier member = fromIdentifierTSNode(scopeNode.getChildByFieldName("name"));
-                return new StaticImportMembers(scope, member);
+                return new StaticImportMembersFromModule(scope, member);
             }
         }
         else if (isWildcardImport(importDeclaration)) {
             Identifier scope = fromIdentifierTSNode(scopeNode);
-            return new ImportAll(scope);
+            return new ImportAllFromModule(scope);
         }
         else {
             Identifier scope = fromIdentifierTSNode(scopeNode.getChildByFieldName("scope"));
             Identifier member = fromIdentifierTSNode(scopeNode.getChildByFieldName("name"));
-            return new ImportMembers(scope, member);
+            return new ImportMembersFromModule(scope, member);
         }
     }
 
@@ -807,7 +807,6 @@ public class JavaLanguage extends LanguageParser {
         ClassDeclaration decl = new ClassDeclaration(modifiers, className);
         // TODO: нужно поменять getNodes() у CompoundStatement, чтобы он не массив возвращал
         ClassDefinition def = new ClassDefinition(decl, classBody);
-        classBody.getEnv().setOwner(def);
         return def;
     }
 

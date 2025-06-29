@@ -19,9 +19,9 @@ public abstract class CaseBlock extends Statement implements HasBodyStatement {
     }
 
     @Override
-    public CompoundStatement makeCompoundBody(SymbolEnvironment env) {
+    public CompoundStatement makeCompoundBody() {
         if (!(body instanceof CompoundStatement)) {
-            body = new CompoundStatement(new SymbolEnvironment(env), getBody());
+            body = new CompoundStatement(getBody());
         }
         return (CompoundStatement) body;
     }

@@ -271,25 +271,33 @@ public class PythonViewer extends LanguageViewer {
     }
 
     private String importToString(Import importStmt) {
-        if (importStmt instanceof ImportMembers importMembers) {
-            if (importMembers.getMembers().isEmpty()) {
-                return String.format("import %s", toString(importStmt.getScope()));
-            } else {
-                return String.format("from %s import %s", toString(importMembers.getScope()),
-                        importMembers.getMembers().stream().map(this::toString).collect(Collectors.joining(", ")));
-            }
-        } else if (importStmt instanceof ImportAll) {
-            return String.format("from %s import *", toString(importStmt.getScope()));
-        } else {
-            return String.format("import %s", toString(importStmt.getScope()));
-        }
+        return switch (importStmt) {
+            case ImportMembersFromModule importMembersFromModule ->
+                    String.format(
+                            "from %s import %s",
+                            toString(importMembersFromModule.getModuleName()),
+                            importMembersFromModule
+                                    .getMembers()
+                                    .stream()
+                                    .map(this::toString)
+                                    .collect(Collectors.joining(", "))
+                    );
+            case ImportAllFromModule importAllFromModule ->
+                    String.format(
+                            "from %s import *",
+                            toString(importAllFromModule.getModuleName())
+                    );
+            case ImportModule importModule ->
+                    String.format("import %s", toString(importModule.getModuleName()));
+            default -> throw new IllegalStateException("Unexpected import type: " + importStmt);
+        };
     }
 
     private String functionDeclarationToString(FunctionDeclaration decl, Tab tab) {
         if (decl instanceof MethodDeclaration method) {
-            return functionToString(new MethodDefinition(method, new CompoundStatement(new SymbolEnvironment(null))), tab);
+            return functionToString(new MethodDefinition(method, new CompoundStatement()), tab);
         }
-        return functionToString(new FunctionDefinition(decl, new CompoundStatement(new SymbolEnvironment(null))), tab);
+        return functionToString(new FunctionDefinition(decl, new CompoundStatement()), tab);
     }
 
     private String classToString(ClassDefinition def, Tab tab) {
@@ -305,7 +313,7 @@ public class PythonViewer extends LanguageViewer {
     }
 
     private String classDeclToString(ClassDeclaration decl, Tab tab) {
-        return toString(new ClassDefinition(decl, new CompoundStatement(new SymbolEnvironment(null))), tab);
+        return toString(new ClassDefinition(decl, new CompoundStatement()), tab);
     }
 
     private String functionToString(Definition func, Tab tab) {
@@ -415,7 +423,7 @@ public class PythonViewer extends LanguageViewer {
                     }
                 }
                 FunctionCall funcCall = new FunctionCall(ident, nulls.toArray(new Expression[0]));
-                entryPointIf = new IfStatement(new EqOp(new SimpleIdentifier("__name__"), StringLiteral.fromUnescaped("__main__", StringLiteral.Type.NONE)), new CompoundStatement(new SymbolEnvironment(null), funcCall),null);
+                entryPointIf = new IfStatement(new EqOp(new SimpleIdentifier("__name__"), StringLiteral.fromUnescaped("__main__", StringLiteral.Type.NONE)), new CompoundStatement(funcCall),null);
             } else if (entryPointNode instanceof CompoundStatement compound) {
                 entryPointIf = new IfStatement(new EqOp(new SimpleIdentifier("__name__"), StringLiteral.fromUnescaped("__main__", StringLiteral.Type.NONE)), compound,null);
             }

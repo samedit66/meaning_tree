@@ -320,10 +320,10 @@ public class CppLanguage extends LanguageParser {
         CaseBlock caseBlock;
         if (!statements.isEmpty() && statements.getLast() instanceof BreakStatement) {
             statements.removeLast();
-            caseBlock = new BasicCaseBlock(matchValue, new CompoundStatement(null, statements));
+            caseBlock = new BasicCaseBlock(matchValue, new CompoundStatement(statements));
         }
         else {
-            caseBlock = new FallthroughCaseBlock(matchValue, new CompoundStatement(null, statements));
+            caseBlock = new FallthroughCaseBlock(matchValue, new CompoundStatement(statements));
         }
 
         return caseBlock;
@@ -351,7 +351,7 @@ public class CppLanguage extends LanguageParser {
                 if (!statements.isEmpty() && statements.getLast() instanceof BreakStatement) {
                     statements.removeLast();
                 }
-                defaultCaseBlock = new DefaultCaseBlock(new CompoundStatement(null, statements));
+                defaultCaseBlock = new DefaultCaseBlock(new CompoundStatement(statements));
             }
             else {
                 CaseBlock caseBlock = fromSwitchGroup(switchGroup);

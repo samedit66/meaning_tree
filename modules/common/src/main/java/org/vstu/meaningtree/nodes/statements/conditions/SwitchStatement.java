@@ -86,9 +86,9 @@ public class SwitchStatement extends Statement {
                 .toList();
     }
 
-    public void makeCompoundBranches(SymbolEnvironment env) {
+    public void makeCompoundBranches() {
         for (CaseBlock branch : cases) {
-            branch.makeCompoundBody(env);
+            branch.makeCompoundBody();
         }
     }
 }

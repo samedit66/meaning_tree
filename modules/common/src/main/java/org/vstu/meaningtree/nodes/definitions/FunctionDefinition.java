@@ -46,7 +46,7 @@ public class FunctionDefinition extends Definition implements HasBodyStatement {
     }
 
     @Override
-    public CompoundStatement makeCompoundBody(SymbolEnvironment env) {
+    public CompoundStatement makeCompoundBody() {
         return body;
     }
 }

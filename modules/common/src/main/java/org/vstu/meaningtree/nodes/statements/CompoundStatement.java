@@ -9,16 +9,14 @@ import org.vstu.meaningtree.utils.env.SymbolEnvironment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompoundStatement extends Statement implements HasSymbolScope {
+public class CompoundStatement extends Statement {
     @TreeNode private List<Node> nodes;
-    private final SymbolEnvironment _env;
 
-    public CompoundStatement(SymbolEnvironment env, Node... nodes) {
-        this(env, List.of(nodes));
+    public CompoundStatement(Node... nodes) {
+        this(List.of(nodes));
     }
 
-    public CompoundStatement(SymbolEnvironment env, List<Node> nodes) {
-        _env = env;
+    public CompoundStatement(List<Node> nodes) {
         this.nodes = new ArrayList<>(nodes);
     }
 
@@ -47,10 +45,5 @@ public class CompoundStatement extends Statement implements HasSymbolScope {
 
     public void insert(int index, Node node) {
         nodes.add(index, node);
-    }
-
-    @Override
-    public SymbolEnvironment getEnv() {
-        return _env;
     }
 }
