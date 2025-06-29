@@ -123,7 +123,7 @@ public class TypeScope {
             boolean createIfNotExists
     ) {
         if (getVariableType(variableName) == null && !createIfNotExists) {
-            throw new IllegalArgumentException("No such variable found");
+            throw new IllegalArgumentException("No such variable found: %s".formatted(variableName));
         }
         _variables.put(variableName, type);
     }
