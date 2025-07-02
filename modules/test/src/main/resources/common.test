@@ -162,7 +162,7 @@ group: LiteralsTest
             {1, 2, 3}
 
         java:
-            new java.util.HashSet<>() {{add(1);add(2);add(3);}};
+            new java.util.HashSet<Object>() {{add(1);add(2);add(3);}};
 
     case: TupleLiteral
         main python:
@@ -183,7 +183,7 @@ group: LiteralsTest
             java.util.TreeMap<String, Object> x = new java.util.TreeMap<>() {{put("a", b);put("x", y);}};
 
         c++:
-            std::map<std::string, auto> = {{"a", b}, {"x", y}};
+            std::map<std::string, auto> x = {{"a", b}, {"x", y}};
 
 
 group: SimpleExpressionsTest
@@ -1659,7 +1659,7 @@ group: StructuresOOP
 group: Other
     case: Import
         python:
-            import a.b.c
+            from a.b import c
 
         java:
             import a.b.c;

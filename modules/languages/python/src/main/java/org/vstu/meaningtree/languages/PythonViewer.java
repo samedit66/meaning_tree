@@ -64,7 +64,6 @@ import org.vstu.meaningtree.nodes.types.builtin.*;
 import org.vstu.meaningtree.nodes.types.containers.*;
 import org.vstu.meaningtree.nodes.types.containers.components.Shape;
 import org.vstu.meaningtree.utils.Label;
-import org.vstu.meaningtree.utils.env.SymbolEnvironment;
 import org.vstu.meaningtree.utils.tokens.OperatorToken;
 
 import java.util.ArrayList;
@@ -509,9 +508,11 @@ public class PythonViewer extends LanguageViewer {
 
         for (int i = 0; i < decls.length; i++) {
             lValues.append(toString(decls[i].getIdentifier()));
-            //NEED DISCUSSION, see typeToString notes
-            if (varDecl.getType() != null && !(varDecl.getType() instanceof UnknownType)) {
-                lValues.append(String.format(": %s", typeToString(varDecl.getType())));
+            // NEED DISCUSSION, see typeToString notes
+            // UPDATE: хинты о типах не добавляются в случае, если много переменных,
+            // т.к. это синтаксическая ошибка
+            if (decls.length == 1 && varDecl.getType() != null && !(varDecl.getType() instanceof UnknownType)) {
+                 lValues.append(String.format(": %s", typeToString(varDecl.getType())));
             }
             if (decls[i].hasInitialization() && decls[i].getRValue() != null) {
                 rValues.append(toString(decls[i].getRValue()));

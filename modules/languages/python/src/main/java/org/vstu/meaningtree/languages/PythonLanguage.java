@@ -9,6 +9,7 @@ import org.vstu.meaningtree.languages.utils.PythonSpecificFeatures;
 import org.vstu.meaningtree.nodes.*;
 import org.vstu.meaningtree.nodes.declarations.*;
 import org.vstu.meaningtree.nodes.declarations.components.DeclarationArgument;
+import org.vstu.meaningtree.nodes.declarations.components.VariableDeclarator;
 import org.vstu.meaningtree.nodes.definitions.*;
 import org.vstu.meaningtree.nodes.definitions.components.DefinitionArgument;
 import org.vstu.meaningtree.nodes.enums.AugmentedAssignmentOperator;
@@ -767,7 +768,6 @@ public class PythonLanguage extends LanguageParser {
 
             if (leftType == null) {
                 scope.changeVariableType(variableName, rightType);
-                return new VariableDeclaration(rightType, variableName, right);
             }
             else {
                 scope.changeVariableType(
@@ -824,19 +824,22 @@ public class PythonLanguage extends LanguageParser {
                 augOp = AugmentedAssignmentOperator.NONE;
         }
 
+        // Обработка распаковки a, b = ...
         if (node.getChildByFieldName("left").getType().equals("pattern_list")) {
             List<Identifier> idents = new ArrayList<>();
-            for (int i = 0; i < node.getChildByFieldName("left").getNamedChildCount(); i++) {
-                idents.add(fromIdentifier(node.getChildByFieldName("left").getNamedChild(i)));
+            TSNode left = node.getChildByFieldName("left");
+            for (int i = 0; i < left.getNamedChildCount(); i++) {
+                idents.add(fromIdentifier(left.getNamedChild(i)));
             }
 
             List<Expression> exprs = new ArrayList<>();
-            if (node.getChildByFieldName("right").getType().equals("expression_list")) {
-                for (int i = 0; i < node.getChildByFieldName("right").getNamedChildCount(); i++) {
-                    exprs.add((Expression) fromTSNode(node.getChildByFieldName("right").getNamedChild(i)));
+            TSNode rightNode = node.getChildByFieldName("right");
+            if (rightNode.getType().equals("expression_list")) {
+                for (int i = 0; i < rightNode.getNamedChildCount(); i++) {
+                    exprs.add((Expression) fromTSNode(rightNode.getNamedChild(i)));
                 }
             } else {
-                exprs.add((Expression) fromTSNode(node.getChildByFieldName("right")));
+                exprs.add((Expression) fromTSNode(rightNode));
             }
             while (exprs.size() < idents.size()) {
                 exprs.add(new NullLiteral());
@@ -845,6 +848,26 @@ public class PythonLanguage extends LanguageParser {
                 throw new UnsupportedParsingException("Invalid using of unpacking construction");
             }
 
+            boolean allNew = augOp == AugmentedAssignmentOperator.NONE
+                    && idents.stream().allMatch(id -> scope.getVariableType((SimpleIdentifier) id) == null);
+
+            if (allNew) {
+                // Вычисляем общий тип по всем выражениям
+                Type commonType = HindleyMilner.chooseGeneralType(
+                        exprs.stream().map(expr -> HindleyMilner.inference(expr, scope)).toList()
+                );
+                // Регистрируем все переменные и создаём декларатор-ы
+                List<VariableDeclarator> decls = new ArrayList<>();
+                for (int i = 0; i < idents.size(); i++) {
+                    Identifier id = idents.get(i);
+                    Expression init = exprs.get(i);
+                    scope.changeVariableType((SimpleIdentifier) id, commonType);
+                    decls.add(new VariableDeclarator((SimpleIdentifier) id, init));
+                }
+                return new VariableDeclaration(commonType, decls);
+            }
+
+            // Иначе — обычный multiple assignment
             List<AssignmentStatement> stmts = new ArrayList<>();
             for (int i = 0; i < idents.size(); i++) {
                 stmts.add(new AssignmentStatement(idents.get(i), exprs.get(i), augOp));
@@ -852,24 +875,23 @@ public class PythonLanguage extends LanguageParser {
             return new MultipleAssignmentStatement(stmts);
         }
 
-        Expression left = (Expression) fromTSNode(node.getChildByFieldName("left"));
+        // Обычное присваивание
+        Expression leftExpr = (Expression) fromTSNode(node.getChildByFieldName("left"));
         Node rightRaw = fromTSNode(node.getChildByFieldName("right"));
-        Expression right;
-        if (rightRaw instanceof AssignmentStatement r) {
-            right = r.toExpression();
-        } else {
-            right = (Expression)rightRaw;
-        }
+        Expression rightExpr = (rightRaw instanceof AssignmentStatement r)
+                ? r.toExpression()
+                : (Expression) rightRaw;
 
-        if (left instanceof SimpleIdentifier variableName && right != null) {
-            var leftType = scope.getVariableType(variableName);
-            var rightType = HindleyMilner.inference(right, scope);
+        if (leftExpr instanceof SimpleIdentifier variableName
+                && rightExpr != null
+                && augOp == AugmentedAssignmentOperator.NONE) {
+            Type leftType = scope.getVariableType(variableName);
+            Type rightType = HindleyMilner.inference(rightExpr, scope);
 
             if (leftType == null) {
                 scope.changeVariableType(variableName, rightType);
-                return new VariableDeclaration(rightType, variableName, right);
-            }
-            else {
+                return new VariableDeclaration(rightType, variableName, rightExpr);
+            } else {
                 scope.changeVariableType(
                         variableName,
                         HindleyMilner.chooseGeneralType(leftType, rightType)
@@ -877,7 +899,7 @@ public class PythonLanguage extends LanguageParser {
             }
         }
 
-        return new AssignmentStatement(left, right, augOp);
+        return new AssignmentStatement(leftExpr, rightExpr, augOp);
     }
 
     private Node fromList(TSNode node, String type) {

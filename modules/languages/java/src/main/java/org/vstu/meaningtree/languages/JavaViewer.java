@@ -1319,7 +1319,14 @@ public class JavaViewer extends LanguageViewer {
     }
 
     public String toString(InstanceOfOp op) {
-        return toString(op, "instanceof");
+        return toString(op.getLeft()) +
+                " instanceof " +
+                switch (op.getType()) {
+                    case IntType t -> "Integer";
+                    case CharacterType t -> "Character";
+                    case BooleanType t -> "Boolean";
+                    default -> toString(op.getType());
+                };
     }
 
     public String toString(NotEqOp op) {
