@@ -83,13 +83,14 @@ public abstract class LanguageTranslator {
         _language = language;
         _viewer = viewer;
 
-        _config.merge(getPredefinedCommonConfig(), getDeclaredConfig());
+        var configBuilder = new ConfigBuilder();
 
         // Загрузка конфигов, специфических для конкретного языка
         for (var entry : rawConfig.entrySet()) {
-            var param = configParser.parse(entry.getKey(), entry.getValue());
-            _config.putNew(param);
+            configBuilder.add(configParser.parse(entry.getKey(), entry.getValue()));
         }
+
+        _config = _config.merge(configBuilder.toConfig(), getPredefinedCommonConfig(), getDeclaredConfig());
 
         if (language != null) {
             _language.setConfig(
