@@ -1,68 +1,104 @@
 package org.vstu.meaningtree.languages.configs;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
+/**
+ * Неизменяемый контейнер конфигурации для языковых трансляторов.
+ * <p>
+ * Использует класс параметра как ключ для типобезопасного доступа.
+ * Все операции изменения возвращают новые экземпляры.
+ */
 public class Config {
     private final Map<Class<?>, ConfigParameter<?>> parameters = new HashMap<>();
 
+    /**
+     * Создает конфигурацию из массива параметров.
+     * Последние параметры переопределяют предыдущие того же типа.
+     */
     public Config(ConfigParameter<?>... configParameters) {
         put(configParameters);
     }
 
+    /**
+     * Создает конфигурацию из коллекции параметров.
+     * Последние параметры переопределяют предыдущие того же типа.
+     */
     public Config(Iterable<ConfigParameter<?>> configParameters) {
         put(configParameters);
     }
 
-    public void put(Iterable<ConfigParameter<?>> configParameters) {
+    private void put(Iterable<ConfigParameter<?>> configParameters) {
         for (var param : configParameters) {
             put(param);
         }
     }
 
-    public void put(ConfigParameter<?>... configParameters) {
+    private void put(ConfigParameter<?>... configParameters) {
         for (var param : configParameters) {
             put(param);
         }
     }
 
-    public void put(ConfigParameter<?> parameter) {
+    private void put(ConfigParameter<?> parameter) {
         parameters.put(parameter.getClass(), parameter);
     }
 
+    /**
+     * Проверяет наличие параметра заданного типа.
+     */
     public <P, T extends ConfigParameter<P>> boolean has(Class<T> paramClass) {
         return parameters.containsKey(paramClass);
     }
 
-    @SuppressWarnings({"unchecked"})
-    public <T extends ConfigParameter<?>> void putNew(T parameter) {
-        if (!has(parameter.getClass())) {
-            put(parameter);
-        }
+    /**
+     * Объединяет с другой конфигурацией.
+     * Параметры другой конфигурации переопределяют параметры текущей.
+     * 
+     * @param other конфигурация для объединения (имеет приоритет)
+     * @return новая объединенная конфигурация
+     */
+    public Config merge(Config other) {
+        Set<ConfigParameter<?>> newParameters = new HashSet<>(other.parameters.values());
+        newParameters.addAll(this.parameters.values());
+        return new Config(newParameters);
     }
 
-    public void merge(Config other) {
-        for (var param : other.parameters.values()) {
-            put(param);
+    /**
+     * Объединяет с несколькими конфигурациями по порядку.
+     * Более поздние конфигурации переопределяют более ранние.
+     * 
+     * @param others конфигурации для объединения (правые имеют приоритет)
+     * @return новая объединенная конфигурация
+     */
+    public Config merge(Config... others) {
+        List<Config> otherConfigs = new LinkedList<>(Arrays.asList(others));
+        otherConfigs.addFirst(this);
+
+        Set<ConfigParameter<?>> newParameters = new HashSet<>();
+
+        for (var config : otherConfigs.reversed()) {
+            newParameters.addAll(config.parameters.values());
         }
+
+        return new Config(newParameters);
     }
 
-    public void merge(Config ...others) {
-        for (var other : others) {
-            merge(other);
-        }
-    }
-
+    /**
+     * Создает подмножество конфига с параметрами, для которых предикат вернул <code>true</code>.
+     */
     public Config subset(Predicate<ConfigParameter<?>> predicate) {
         return new Config(
                 parameters.values().stream().filter(predicate).toList()
         );
     }
 
-    // Приношу свои извинения за эту параметрическую жуть, но зато можно делать
-    // config.get(ExpressionMode.class) - и будет статическая проверка типов с обработкой Optional
+    /**
+     * Получает значение параметра по типу.
+     * 
+     * @param paramClass класс параметра
+     * @return значение параметра или пустой Optional если не найден
+     */
     public <P, T extends ConfigParameter<P>> Optional<P> get(Class<T> paramClass) {
         return Optional.ofNullable(parameters.get(paramClass))
                 .filter(paramClass::isInstance)
