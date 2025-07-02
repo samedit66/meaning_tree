@@ -90,7 +90,7 @@ public abstract class LanguageTranslator {
             configBuilder.add(configParser.parse(entry.getKey(), entry.getValue()));
         }
 
-        _config = _config.merge(configBuilder.toConfig(), getPredefinedCommonConfig(), getDeclaredConfig());
+        _config = _config.merge(getPredefinedCommonConfig(), getDeclaredConfig(), configBuilder.toConfig());
 
         if (language != null) {
             _language.setConfig(
