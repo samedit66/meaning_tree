@@ -69,4 +69,17 @@ public class Config {
                 .map(paramClass::cast)
                 .map(ConfigParameter::getValue);
     }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        for (var param : parameters.entrySet()) {
+            builder.append(param.getKey().getSimpleName());
+            builder.append(" - ");
+            builder.append(param.getValue()._value.toString());
+            builder.append("\n");
+        }
+
+        return builder.toString();
+    }
 }
