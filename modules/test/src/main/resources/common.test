@@ -300,256 +300,220 @@ group: SimpleExpressionsTest
     case: UnaryMinusOp
         python:
             x: int = 0
-            a: int = 0
-            a = -x
+            a: int = -x
 
         java:
             int x = 0;
-            int a = 0;
-            a = -x;
+            int a = -x;
 
         c++:
             int x = 0;
-            int a = 0;
-            a = -x;
+            int a = -x;
 
     case: ContainsOp
         main python:
             list: List[int] = []
             x: int = 0
-            a: bool = False
-            a = x in list
+            a: bool = x in list
 
         java:
             java.util.ArrayList<Object> list = new java.util.ArrayList<>(java.util.List.of());
             int x = 0;
-            boolean a = false;
-            a = list.contains(x);
+            boolean a = list.contains(x);
 
         c++:
             std::vector<auto> list = {};
             int x = 0;
-            bool a = false;
-            a = list.contains(x);
+            bool a = list.contains(x);
 
     case: ContainsNegativeOp
         main python:
             list: List[int] = []
             x: int = 0
-            a: bool = False
-            a = x not in list
+            a: bool = x not in list
 
         java:
             java.util.ArrayList<Object> list = new java.util.ArrayList<>(java.util.List.of());
             int x = 0;
-            boolean a = false;
-            a = !list.contains(x);
+            boolean a = !list.contains(x);
 
         c++:
             std::vector<auto> list = {};
             int x = 0;
-            bool a = false;
-            a = !list.contains(x);
+            bool a = !list.contains(x);
 
     case: ReferenceEqualOp
         main python:
             a: int = 0
             b: int = 0
-            result: bool = False
-            result = a is b
+            result: bool = a is b
 
         java:
             int a = 0;
             int b = 0;
-            boolean result = false;
-            result = a == b;
+            boolean result = a == b;
 
         c++:
             int a = 0;
             int b = 0;
-            bool result = false;
-            result = &a == &b;
+            bool result = &a == &b;
 
     case: ReferenceNotEqualOp
         main python:
             a: int = 0
             b: int = 0
-            result: bool = False
-            result = a is not b
+            result: bool = a is not b
 
         java:
             int a = 0;
             int b = 0;
-            boolean result = false;
-            result = a != b;
+            boolean result = a != b;
 
         c++:
             int a = 0;
             int b = 0;
-            bool result = false;
-            result = &a != &b;
+            bool result = &a != &b;
 
     case: NotInstanceOf
         python:
             a: int = 0
-            result: bool = False
-            result = not isinstance(a, int)
+            result: bool = not isinstance(a, int)
 
         java:
             int a = 0;
-            boolean result = false;
-            result = !(a instanceof Integer);
+            boolean result = !(a instanceof Integer);
 
         c++:
             int a = 0;
-            bool result = false;
-            result = dynamic_cast<int>(a) == nullptr;
+            bool result = dynamic_cast<int>(a) == nullptr;
 
     case: InstanceOf
         python:
             a: int = 0
-            result: bool = False
-            result = isinstance(a, int)
+            result: bool = isinstance(a, int)
 
         java:
             int a = 0;
-            boolean result = false;
-            result = a instanceof Integer;
+            boolean result = a instanceof Integer;
 
         c++:
             int a = 0;
-            bool result = false;
-            result = dynamic_cast<int>(a) != nullptr;
+            bool result = dynamic_cast<int>(a) != nullptr;
 
     case: UnaryPlusOp
         python:
             x: int = 0
-            a: int = 0
-            a = +x
+            a: int = +x
 
         java:
             int x = 0;
-            int a = 0;
-            a = +x;
+            int a = +x;
 
         c++:
             int x = 0;
-            int a = 0;
-            a = +x;
+            int a = +x;
 
 
     case: ModOp
         python:
             x: int = 0
             y: int = 0
-            a: int = 0
-            a = x % y
+            a: int = x % y
 
         java:
             int x = 0;
             int y = 0;
-            int a = 0;
-            a = x % y;
+            int a = x % y;
 
         c++:
             int x = 0;
             int y = 0;
-            int a = 0;
-            a = x % y;
+            int a = x % y;
 
 
     case: PowOp
         python:
             x: int = 0
             y: int = 0
-            a: float = 0.0
-            a = x ** y
+            a: float = x ** y
 
         java:
             int x = 0;
             int y = 0;
-            float a = 0.0;
-            a = Math.pow(x, y);
+            float a = Math.pow(x, y);
 
         c++:
             int x = 0;
             int y = 0;
-            float a = 0.0;
-            a = pow(x, y);
+            float a = pow(x, y);
 
 
     case: AndOp
         python:
             x: bool = False
             y: bool = False
-            a: bool = False
-            a = x and y
+            a: bool = x and y
 
         java:
             boolean x = false;
             boolean y = false;
-            boolean a = false;
-            a = x && y;
+            boolean a = x && y;
 
         c++:
             bool x = false;
             bool y = false;
-            bool a = false;
-            a = x && y;
+            bool a = x && y;
 
 
     case: OrOp
         python:
             x: bool = False
             y: bool = False
-            a: bool = False
-            a = x or y
+            a: bool = x or y
 
         java:
             boolean x = false;
             boolean y = false;
-            boolean a = false;
-            a = x || y;
+            boolean a = x || y;
 
         c++:
             bool x = false;
             bool y = false;
-            bool a = false;
-            a = x || y;
+            bool a = x || y;
 
 
     case: BitwiseAndOp
         python:
             x: int = 0
             y: int = 0
-            res: int = (x & y)
+            res: int = x & y
 
         java:
             int x = 0;
             int y = 0;
-            int res = (x & y);
+            int res = x & y;
 
         c++:
             int x = 0;
             int y = 0;
-            int res = (x & y);
+            int res = x & y;
 
 
     case: BitwiseOrOp
         python:
             x: int = 0
             y: int = 0
-            res: int = (x | y)
+            res: int = x | y
 
         java:
             int x = 0;
             int y = 0;
-            int res = (x | y);
+            int res = x | y;
 
         c++:
             int x = 0;
             int y = 0;
-            int res = (x | y);
+            int res = x | y;
 
 
     case: BitwiseNotOp
@@ -586,49 +550,49 @@ group: SimpleExpressionsTest
     case: NotOp
         python:
             x: bool = False
-            x = not x
+            res: bool = not x
 
         java:
             boolean x = false;
-            x = !x;
+            boolean res = !x;
 
         c++:
             bool x = false;
-            x = !x;
+            bool res = !x;
 
 
     case: BitwiseLeftShiftOp
         python:
             x: int = 0
             y: int = 0
-            x = x << y
+            res: int = x << y
 
         java:
             int x = 0;
             int y = 0;
-            x = x << y;
+            int res = x << y;
 
         c++:
             int x = 0;
             int y = 0;
-            x = x << y;
+            int res = x << y;
 
 
     case: BitwiseRightShiftOp
         python:
             x: int = 0
             y: int = 0
-            x = x >> y
+            res: int = x >> y
 
         java:
             int x = 0;
             int y = 0;
-            x = x >> y;
+            int res = x >> y;
 
         c++:
             int x = 0;
             int y = 0;
-            x = x >> y;
+            int res = x >> y;
 
 
     case: TernaryOp
@@ -727,79 +691,130 @@ group: SimpleExpressionsTest
 group: ComparisonsTest
     case: LessOp
         python:
-            (a < b)
+            a: int = 0
+            b: int = 0
+            res: bool = a < b
 
         java:
-            (a < b);
+            int a = 0;
+            int b = 0;
+            boolean res = a < b;
 
         c++:
-            (a < b);
+            int a = 0;
+            int b = 0;
+            bool res = a < b;
 
 
     case: LessEqualOp
         python:
-            a <= b
+            a: int = 0
+            b: int = 0
+            res: bool = a <= b
 
         java:
-            a <= b;
+            int a = 0;
+            int b = 0;
+            boolean res = a <= b;
 
         c++:
-            a <= b;
+            int a = 0;
+            int b = 0;
+            bool res = a <= b;
 
 
     case: GreaterEqualOp
         python:
-            a >= b
+            a: int = 0
+            b: int = 0
+            res: bool = a >= b
 
         java:
-            a >= b;
+            int a = 0;
+            int b = 0;
+            boolean res = a >= b;
 
         c++:
-            a >= b;
+            int a = 0;
+            int b = 0;
+            bool res = a >= b;
 
 
     case: GreaterOp
         python:
-            a > b
+            a: int = 0
+            b: int = 0
+            res: bool = a > b
 
         java:
-            a > b;
+            int a = 0;
+            int b = 0;
+            boolean res = a > b;
 
         c++:
-            a > b;
+            int a = 0;
+            int b = 0;
+            bool res = a > b;
 
 
     case: EqOp
         python:
-            a == b
+            a: int = 0
+            b: int = 0
+            res: bool = a == b
 
         java:
-            a == b;
+            int a = 0;
+            int b = 0;
+            boolean res = a == b;
 
         c++:
-            a == b;
+            int a = 0;
+            int b = 0;
+            bool res = a == b;
 
 
     case: NotEqOp
         python:
-            a != b
+            a: int = 0
+            b: int = 0
+            res: bool = a != b
 
         java:
-            a != b;
+            int a = 0;
+            int b = 0;
+            boolean res = a != b;
 
         c++:
-            a != b;
+            int a = 0;
+            int b = 0;
+            bool res = a != b;
 
 
     case: CompoundComparisonConvertationBetweenLanguages
         python:
-            (a < b < c and k <= m)
+            a: int = 0
+            b: int = 0
+            c: int = 0
+            k: int = 0
+            m: int = 0
+            res: bool = a < b < c and k <= m
 
         java:
-            (a < b && b < c && k <= m);
+            int a = 0;
+            int b = 0;
+            int c = 0;
+            int k = 0;
+            int m = 0;
+            boolean res = a < b && b < c && k <= m;
 
         c++:
-            (a < b && b < c && k <= m);
+            int a = 0;
+            int b = 0;
+            int c = 0;
+            int k = 0;
+            int m = 0;
+            bool res = a < b && b < c && k <= m;
 
 
 group: SimpleStatements
