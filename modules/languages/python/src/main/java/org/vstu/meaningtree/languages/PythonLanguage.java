@@ -948,7 +948,6 @@ public class PythonLanguage extends LanguageParser {
     private ConditionBranch createConditionBranchTSNode(TSNode node) {
         Expression condition = (Expression) fromTSNode(node.getChildByFieldName("condition"));
         CompoundStatement consequence = (CompoundStatement) fromTSNode(node.getChildByFieldName("consequence"));
-        rollbackContext();
         return new ConditionBranch(condition, consequence);
     }
 
