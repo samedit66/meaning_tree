@@ -943,8 +943,7 @@ group: SimpleStatements
             }
 
         c++:
-            if (a)
-            {
+            if (a) {
             }
 
 
@@ -1052,7 +1051,7 @@ group: Conditions
             elif b:
                 pass
             else:
-                c = k * 3
+                c: int = k * 3
 
         c++:
             if (a) {
@@ -1060,7 +1059,7 @@ group: Conditions
             else if (b) {
             }
             else {
-                c = k * 3;
+                int c = k * 3;
             }
 
         java:
@@ -1069,7 +1068,7 @@ group: Conditions
             else if (b) {
             }
             else {
-                c = k * 3;
+                int c = k * 3;
             }
 
 
@@ -1177,26 +1176,27 @@ group: Conditions
 
         c++:
             if (a > b) {
-                z += 1;
+                z++;
                 if (x && y) {
                     if (x == 7) {
-                        x += 1;
+                        x++;
                     }
-                    c += 1;
+                    c++;
                 }
-                c += 1;
+                c++;
             }
             else if (a < b) {
-                x += 1;
+                x++;
                 if (x > 5) {
                     if (x != 7) {
                         std::cout << "alarm" << std::endl;
-                    } else {
-                        k += 1;
                     }
-                    c += 1;
+                    else {
+                        k++;
+                    }
+                    c++;
                 }
-                y -= 1;
+                y--;
             }
 
 
