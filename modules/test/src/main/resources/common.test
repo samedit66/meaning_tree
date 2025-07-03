@@ -520,79 +520,115 @@ group: SimpleExpressionsTest
 
     case: BitwiseAndOp
         python:
-            (x & y)
+            x: int = 0
+            y: int = 0
+            res: int = (x & y)
 
         java:
-            (x & y);
+            int x = 0;
+            int y = 0;
+            int res = (x & y);
 
         c++:
-            (x & y);
+            int x = 0;
+            int y = 0;
+            int res = (x & y);
 
 
     case: BitwiseOrOp
         python:
-            x | y
+            x: int = 0
+            y: int = 0
+            res: int = (x | y)
 
         java:
-            x | y;
+            int x = 0;
+            int y = 0;
+            int res = (x | y);
 
         c++:
-            x | y;
+            int x = 0;
+            int y = 0;
+            int res = (x | y);
 
 
     case: BitwiseNotOp
         python:
-            ~x
+            x: int = 0
+            res: int = ~x
 
         java:
-            ~x;
+            int x = 0;
+            int res = ~x;
 
         c++:
-            ~x;
+            int x = 0;
+            int res = ~x;
 
 
     case: BitwiseXorOp
         python:
-            x ^ y
+            x: int = 0
+            y: int = 0
+            res: int = x ^ y
 
         java:
-            x ^ y;
+            int x = 0;
+            int y = 0;
+            int res = x ^ y;
 
         c++:
-            x ^ y;
+            int x = 0;
+            int y = 0;
+            int res = x ^ y;
 
 
     case: NotOp
         python:
-            not x
+            x: bool = False
+            x = not x
 
         java:
-            !x;
+            boolean x = false;
+            x = !x;
 
         c++:
-            !x;
+            bool x = false;
+            x = !x;
 
 
     case: BitwiseLeftShiftOp
         python:
-            x << y
+            x: int = 0
+            y: int = 0
+            x = x << y
 
         java:
-            x << y;
+            int x = 0;
+            int y = 0;
+            x = x << y;
 
         c++:
-            x << y;
+            int x = 0;
+            int y = 0;
+            x = x << y;
 
 
     case: BitwiseRightShiftOp
         python:
-            x >> y
+            x: int = 0
+            y: int = 0
+            x = x >> y
 
         java:
-            x >> y;
+            int x = 0;
+            int y = 0;
+            x = x >> y;
 
         c++:
-            x >> y;
+            int x = 0;
+            int y = 0;
+            x = x >> y;
 
 
     case: TernaryOp
