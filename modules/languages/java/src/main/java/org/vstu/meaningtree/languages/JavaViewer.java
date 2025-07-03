@@ -159,7 +159,7 @@ public class JavaViewer extends LanguageViewer {
             case PointerType ptr -> toString(ptr.getTargetType());
             case MemoryAllocationCall memoryAllocationCall -> toString(memoryAllocationCall.toNew());
             case MemoryFreeCall freeCall -> toString(freeCall.toDelete());
-            case Type type -> toString(type, false);
+            case Type type -> toString(type);
             case SelfReference selfReference -> toString(selfReference);
             case UnaryMinusOp unaryMinusOp -> toString(unaryMinusOp);
             case UnaryPlusOp unaryPlusOp -> toString(unaryPlusOp);
@@ -427,7 +427,7 @@ public class JavaViewer extends LanguageViewer {
 
     public String toString(PlainCollectionLiteral unmodifiableListLiteral) {
         var builder = new StringBuilder();
-        String typeHint = unmodifiableListLiteral.getTypeHint() == null ? "Object" : toString(unmodifiableListLiteral.getTypeHint(), false);
+        String typeHint = unmodifiableListLiteral.getTypeHint() == null ? "Object" : toString(unmodifiableListLiteral.getTypeHint());
         builder.append(String.format("new %s[] {", typeHint));
 
         for (Expression expression : unmodifiableListLiteral.getList()) {
@@ -796,7 +796,7 @@ public class JavaViewer extends LanguageViewer {
         StringBuilder builder = new StringBuilder();
         builder.append("new ");
 
-        String type = toString(arrayNewExpression.getType(), false);
+        String type = toString(arrayNewExpression.getType());
         builder.append(type);
 
         String dimensions = toString(arrayNewExpression.getShape());
@@ -1324,15 +1324,24 @@ public class JavaViewer extends LanguageViewer {
         return toString(op, "<");
     }
 
+    private String wrapperTypeName(Type possiblePrimitiveType) {
+        return switch (possiblePrimitiveType) {
+            case IntType t -> switch (t.size) {
+                case 8 -> "Byte";
+                case 16 -> "Short";
+                case 32 -> "Integer";
+                default -> "Long";
+            };
+            case CharacterType t -> "Character";
+            case BooleanType t -> "Boolean";
+            case FloatType t -> t.size == 32 ? "Float" : "Double";
+            default -> toString(possiblePrimitiveType);
+        };
+    }
+
     public String toString(InstanceOfOp op) {
-        return toString(op.getLeft()) +
-                " instanceof " +
-                switch (op.getType()) {
-                    case IntType t -> "Integer";
-                    case CharacterType t -> "Character";
-                    case BooleanType t -> "Boolean";
-                    default -> toString(op.getType());
-                };
+        return toString(op.getLeft()) + " instanceof " +
+                wrapperTypeName(op.getType());
     }
 
     public String toString(NotEqOp op) {
@@ -1445,20 +1454,16 @@ public class JavaViewer extends LanguageViewer {
     }
 
     private String toString(Type type) {
-        return toString(type, false);
-    }
-
-    private String toString(Type type, boolean isPrimitiveWrapper) {
         return switch (type) {
-            case FloatType floatType -> toString(floatType, isPrimitiveWrapper);
-            case IntType intType -> toString(intType, isPrimitiveWrapper);
-            case BooleanType booleanType -> toString(booleanType, isPrimitiveWrapper);
+            case FloatType floatType -> toString(floatType);
+            case IntType intType -> toString(intType);
+            case BooleanType booleanType -> toString(booleanType);
             case StringType stringType -> toString(stringType);
             case NoReturn voidType -> toString(voidType);
             case UnknownType unknownType -> toString(unknownType);
             case ArrayType arrayType -> toString(arrayType);
             case UserType userType -> toString(userType);
-            case CharacterType characterType -> toString(characterType, isPrimitiveWrapper);
+            case CharacterType characterType -> toString(characterType);
             case SetType setType -> toString(setType);
             case DictionaryType dictType -> toString(dictType);
             case PlainCollectionType plain -> toString(plain);
@@ -1467,38 +1472,37 @@ public class JavaViewer extends LanguageViewer {
         };
     }
 
+    public String toString(FloatType type) {
+        return type.size == 32 ? "float" : "double";
+    }
+
+    public String toString(IntType type) {
+        return switch (type.size) {
+            case 8 -> "byte";
+            case 16 -> "short";
+            case 32 -> "int";
+            default -> "long";
+        };
+    }
+
+    public String toString(BooleanType type) {
+        return "boolean";
+    }
+
     public String toString(SetType type) {
-        return String.format("java.util.HashSet<%s>", toString(type.getItemType()));
+        var typeName = wrapperTypeName(type.getItemType());
+        return String.format("java.util.HashSet<%s>", typeName);
     }
 
     public String toString(PlainCollectionType type) {
-        return String.format("java.util.ArrayList<%s>", toString(type.getItemType()));
+        var typeName = wrapperTypeName(type.getItemType());
+        return String.format("java.util.ArrayList<%s>", typeName);
     }
 
     public String toString(DictionaryType type) {
-        return String.format("java.util.TreeMap<%s, %s>", toString(type.getKeyType()), toString(type.getValueType()));
-    }
-
-    private String toString(FloatType type, boolean isPrimitiveWrapper) {
-        if (isPrimitiveWrapper) {
-            return type.size == 64 ? "Double" : "Float";
-        } else {
-            return type.size == 64 ? "double" : "float";
-        }
-    }
-
-    private String toString(IntType type, boolean isPrimitiveWrapper) {
-        if (type.size == 16) {
-            return isPrimitiveWrapper ? "Short" : "short";
-        } else if (type.size == 32) {
-            return isPrimitiveWrapper ? "Integer" : "int";
-        } else {
-            return isPrimitiveWrapper ? "Long" : "long";
-        }
-    }
-
-    private String toString(BooleanType type, boolean isPrimitiveWrapper) {
-        return isPrimitiveWrapper ? "Boolean" : "boolean";
+        var keyTypeName = wrapperTypeName(type.getKeyType());
+        var valueTypeName = wrapperTypeName(type.getValueType());
+        return String.format("java.util.TreeMap<%s, %s>", keyTypeName, valueTypeName);
     }
 
     private String toString(StringType type) {
@@ -1511,10 +1515,6 @@ public class JavaViewer extends LanguageViewer {
 
     private String toString(UnknownType type) {
         return "Object";
-    }
-
-    private String toString(CharacterType type, boolean isPrimitiveWrapper) {
-        return isPrimitiveWrapper ? "Character" : "char";
     }
 
     private String toString(Shape shape) {
@@ -1537,7 +1537,7 @@ public class JavaViewer extends LanguageViewer {
     private String toString(ArrayType type) {
         StringBuilder builder = new StringBuilder();
 
-        String baseType = toString(type.getItemType(), false);
+        String baseType = toString(type.getItemType());
         builder.append(baseType);
         builder.append(toString(type.getShape()));
 
@@ -1581,7 +1581,7 @@ public class JavaViewer extends LanguageViewer {
         StringBuilder builder = new StringBuilder();
 
         Type declarationType = stmt.getType();
-        String type = toString(declarationType, false);
+        String type = toString(declarationType);
         if (declarationType.isConst()) {
             builder.append("final ");
         }
