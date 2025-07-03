@@ -32,7 +32,7 @@ public abstract class LanguageTranslator {
         return new Config(
                 new ExpressionMode(false, ConfigScope.TRANSLATOR),
                 new TranslationUnitMode(true, ConfigScope.VIEWER),
-                new SkipErrors(false, ConfigScope.PARSER),
+                new SkipErrors(true, ConfigScope.PARSER),
                 new EnforceEntryPoint(true, ConfigScope.ANY)
         );
     }

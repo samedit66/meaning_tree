@@ -23,6 +23,7 @@ import org.vstu.meaningtree.nodes.expressions.other.KeyValuePair;
 import org.vstu.meaningtree.nodes.expressions.other.Range;
 import org.vstu.meaningtree.nodes.expressions.other.TernaryOperator;
 import org.vstu.meaningtree.nodes.expressions.unary.*;
+import org.vstu.meaningtree.nodes.interfaces.HasBodyStatement;
 import org.vstu.meaningtree.nodes.statements.CompoundStatement;
 import org.vstu.meaningtree.nodes.statements.ExpressionStatement;
 import org.vstu.meaningtree.nodes.statements.assignments.AssignmentStatement;
@@ -511,9 +512,7 @@ public class HindleyMilner {
     }
 
     public static void inference(@NotNull List<Node> nodes, @NotNull TypeScope scope) {
-
-        for (var node : nodes) {
-
+        for (var node: nodes) {
             switch (node) {
                 case ExpressionStatement expressionStatement -> inference(expressionStatement.getExpression(), scope);
                 case AssignmentStatement assignmentStatement -> inference(assignmentStatement, scope);
@@ -523,24 +522,17 @@ public class HindleyMilner {
                 case VariableDeclaration variableDeclaration -> inference(variableDeclaration, scope);
                 case VariableDeclarator variableDeclarator -> inference(variableDeclarator, scope);
                 case Expression expression -> inference(expression, scope);
-                case null, default -> {
-                    List<Node> nodes_ = node.allChildren()
-                            .stream()
-                            .map(obj -> (Node) obj)
-                            .toList();
-
-                    for (var node_ : nodes_) {
-
-                        if (node_ instanceof Expression expression) {
-                            inference(expression, scope);
-                        } else if (node_ instanceof Statement s) {
-                            inference(s, scope);
-                        } else if (node_ instanceof Declaration d) {
-                            inference(d, scope);
-                        } else {
-                            inference(List.of(node_), scope);
+                case HasBodyStatement hasBodyStatement -> {
+                    if (hasBodyStatement.getBody() instanceof CompoundStatement compoundStatement) {
+                        for (var possibleStatement: compoundStatement.getNodes()) {
+                            if (possibleStatement instanceof Statement statement) {
+                                inference(statement, scope);
+                            }
                         }
                     }
+                }
+                default -> {
+                    /* TODO: проанализировать, какие еще есть варианты для обобщения... */
                 }
             }
         }
