@@ -189,204 +189,333 @@ group: LiteralsTest
 group: SimpleExpressionsTest
     case: PlusOp
         python:
-            a + 5
+            a: int = 1
+            a = a + 5
 
         java:
-            a + 5;
+            int a = 1;
+            a = a + 5;
 
         c++:
-            a + 5;
+            int a = 1;
+            a = a + 5;
 
 
     case: SubOp
         python:
-            x - y
+            x: int = 0
+            y: int = 0
+            a: int = x - y
 
         java:
-            x - y;
+            int x = 0;
+            int y = 0;
+            int a = x - y;
 
         c++:
-            x - y;
+            int x = 0;
+            int y = 0;
+            int a = x - y;
 
 
     case: MulOp
         python:
-            (x * y)
+            x: int = 0
+            y: int = 0
+            a: int = x * y
 
         java:
-            (x * y);
+            int x = 0;
+            int y = 0;
+            int a = x * y;
 
         c++:
-            (x * y);
+            int x = 0;
+            int y = 0;
+            int a = x * y;
 
 
     case: DivOp
         python:
-            x / y
+            x: int = 0
+            y: int = 0
+            a: float = x / y
 
         java:
-            x / y;
+            int x = 0;
+            int y = 0;
+            float a = x / y;
 
         c++:
-            x / y;
+            int x = 0;
+            int y = 0;
+            float a = x / y;
 
 
     case: FloorDivOp
         python:
-            x // y
+            x: int = 0
+            y: int = 0
+            a: int = x // y
 
         java:
-            (long) (x / y);
+            int x = 0;
+            int y = 0;
+            int a = (long) (x / y);
 
         c++:
-            (long) (x / y);
+            int x = 0;
+            int y = 0;
+            int a = (long) (x / y);
 
 
     case: IncrementOp
         python:
+            x: int = 0
             x += 1
 
         java:
+            int x = 0;
             x++;
 
         c++:
+            int x = 0;
             x++;
 
 
     case: DecrementOp
         python:
+            x: int = 0
             x -= 1
 
         java:
+            int x = 0;
             x--;
 
         c++:
+            int x = 0;
             x--;
 
 
     case: UnaryMinusOp
         python:
-            -x
+            x: int = 0
+            a: int = 0
+            a = -x
 
         java:
-            -x;
+            int x = 0;
+            int a = 0;
+            a = -x;
 
         c++:
-            -x;
+            int x = 0;
+            int a = 0;
+            a = -x;
 
     case: ContainsOp
         main python:
-            x in list
+            list: List[int] = []
+            x: int = 0
+            a: bool = False
+            a = x in list
 
         java:
-            list.contains(x);
+            java.util.ArrayList<Object> list = new java.util.ArrayList<>(java.util.List.of());
+            int x = 0;
+            boolean a = false;
+            a = list.contains(x);
 
         c++:
-            list.contains(x);
+            std::vector<auto> list = {};
+            int x = 0;
+            bool a = false;
+            a = list.contains(x);
 
     case: ContainsNegativeOp
         main python:
-            x not in list
+            list: List[int] = []
+            x: int = 0
+            a: bool = False
+            a = x not in list
 
         java:
-            !list.contains(x);
+            java.util.ArrayList<Object> list = new java.util.ArrayList<>(java.util.List.of());
+            int x = 0;
+            boolean a = false;
+            a = !list.contains(x);
 
         c++:
-            !list.contains(x);
+            std::vector<auto> list = {};
+            int x = 0;
+            bool a = false;
+            a = !list.contains(x);
 
     case: ReferenceEqualOp
         main python:
-            a is b
+            a: int = 0
+            b: int = 0
+            result: bool = False
+            result = a is b
 
         java:
-            a == b;
+            int a = 0;
+            int b = 0;
+            boolean result = false;
+            result = a == b;
 
         c++:
-            &a == &b;
+            int a = 0;
+            int b = 0;
+            bool result = false;
+            result = &a == &b;
 
     case: ReferenceNotEqualOp
         main python:
-            a is not b
+            a: int = 0
+            b: int = 0
+            result: bool = False
+            result = a is not b
 
         java:
-            a != b;
+            int a = 0;
+            int b = 0;
+            boolean result = false;
+            result = a != b;
 
         c++:
-            &a != &b;
+            int a = 0;
+            int b = 0;
+            bool result = false;
+            result = &a != &b;
 
     case: NotInstanceOf
         python:
-            not isinstance(a, int)
+            a: int = 0
+            result: bool = False
+            result = not isinstance(a, int)
 
         java:
-            !(a instanceof Integer);
+            int a = 0;
+            boolean result = false;
+            result = !(a instanceof Integer);
 
         c++:
-            dynamic_cast<int>(a) == nullptr;
+            int a = 0;
+            bool result = false;
+            result = dynamic_cast<int>(a) == nullptr;
 
     case: InstanceOf
         python:
-            isinstance(a, int)
+            a: int = 0
+            result: bool = False
+            result = isinstance(a, int)
 
         java:
-            a instanceof Integer;
+            int a = 0;
+            boolean result = false;
+            result = a instanceof Integer;
 
         c++:
-            dynamic_cast<int>(a) != nullptr;
+            int a = 0;
+            bool result = false;
+            result = dynamic_cast<int>(a) != nullptr;
 
     case: UnaryPlusOp
         python:
-            +x
+            x: int = 0
+            a: int = 0
+            a = +x
 
         java:
-            +x;
+            int x = 0;
+            int a = 0;
+            a = +x;
 
         c++:
-            +x;
+            int x = 0;
+            int a = 0;
+            a = +x;
 
 
     case: ModOp
         python:
-            x % y
+            x: int = 0
+            y: int = 0
+            a: int = 0
+            a = x % y
 
         java:
-            x % y;
+            int x = 0;
+            int y = 0;
+            int a = 0;
+            a = x % y;
 
         c++:
-            x % y;
+            int x = 0;
+            int y = 0;
+            int a = 0;
+            a = x % y;
 
 
     case: PowOp
         python:
-            x ** y
+            x: int = 0
+            y: int = 0
+            a: float = 0.0
+            a = x ** y
 
         java:
-            Math.pow(x, y);
+            int x = 0;
+            int y = 0;
+            float a = 0.0;
+            a = Math.pow(x, y);
 
         c++:
-            pow(x, y);
+            int x = 0;
+            int y = 0;
+            float a = 0.0;
+            a = pow(x, y);
 
 
     case: AndOp
         python:
-            (x and y)
+            x: bool = False
+            y: bool = False
+            a: bool = False
+            a = x and y
 
         java:
-            (x && y);
+            boolean x = false;
+            boolean y = false;
+            boolean a = false;
+            a = x && y;
 
         c++:
-            (x && y);
+            bool x = false;
+            bool y = false;
+            bool a = false;
+            a = x && y;
 
 
     case: OrOp
         python:
-            x or y
+            x: bool = False
+            y: bool = False
+            a: bool = False
+            a = x or y
 
         java:
-            x || y;
+            boolean x = false;
+            boolean y = false;
+            boolean a = false;
+            a = x || y;
 
         c++:
-            x || y;
+            bool x = false;
+            bool y = false;
+            bool a = false;
+            a = x || y;
 
 
     case: BitwiseAndOp
@@ -547,6 +676,9 @@ group: SimpleExpressionsTest
             x & y == z
 
         java:
+            (x & y) == z;
+
+        c++:
             (x & y) == z;
 
     case: DifferentPriorityOperators
