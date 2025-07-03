@@ -180,7 +180,10 @@ public class HindleyMilner {
 
     @NotNull
     public static Type chooseGeneralType(Type first, Type second) {
-        if (first instanceof NumericType && second instanceof NumericType) {
+        if (first instanceof UnknownType || second instanceof UnknownType) {
+            return new UnknownType();
+        }
+        else if (first instanceof NumericType && second instanceof NumericType) {
             if (first instanceof FloatType || second instanceof FloatType) {
                 return new FloatType();
             }
@@ -208,7 +211,7 @@ public class HindleyMilner {
 
         return chooseGeneralType(
                 types.getFirst(),
-                chooseGeneralType(types.subList(0, types.size() - 1))
+                chooseGeneralType(types.subList(1, types.size()))
         );
     }
 

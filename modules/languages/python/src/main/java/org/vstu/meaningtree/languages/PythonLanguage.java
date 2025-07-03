@@ -857,9 +857,9 @@ public class PythonLanguage extends LanguageParser {
 
             if (allNew) {
                 // Вычисляем общий тип по всем выражениям
-                Type commonType = HindleyMilner.chooseGeneralType(
-                        exprs.stream().map(expr -> HindleyMilner.inference(expr, scope)).toList()
-                );
+                var evaluatedTypes = exprs.stream().map(expr -> HindleyMilner.inference(expr, scope)).toList();
+                Type commonType = HindleyMilner.chooseGeneralType(evaluatedTypes);
+
                 // Регистрируем все переменные и создаём декларатор-ы
                 List<VariableDeclarator> decls = new ArrayList<>();
                 for (int i = 0; i < idents.size(); i++) {
