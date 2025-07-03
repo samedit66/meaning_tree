@@ -1308,6 +1308,10 @@ public class CppViewer extends LanguageViewer {
         String l = toString(left);
         String r = toString(right);
 
+        if ((op == AugmentedAssignmentOperator.ADD || op == AugmentedAssignmentOperator.SUB) && r.equals("1")) {
+            return (op == AugmentedAssignmentOperator.ADD) ? l + "++" : l + "--";
+        }
+
         return "%s %s %s".formatted(l, o, r);
     }
 
