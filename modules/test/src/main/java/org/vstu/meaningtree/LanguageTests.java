@@ -57,7 +57,7 @@ class LanguageTests {
         HashMap<String, String> defaultConfig = new HashMap<>() {{
             put("translationUnitMode", "false");
             put("enforceEntryPoint", "true");
-            put("skipErrors", "true");
+            put("skipErrors", "false");
         }};
 
         _config.addLanguageConfig(new TestLanguageConfig(new JavaTranslator(defaultConfig), "java", false));
