@@ -943,9 +943,9 @@ group: SimpleStatements
             }
 
         c++:
-            if (a) {
+            if (a)
+            {
             }
-    # TODO: Продумать как выполнять преобразование
 
 
     case: MultipleAssignment
@@ -953,12 +953,10 @@ group: SimpleStatements
             a, b = 3, 45
 
         java:
-            a = 3;
-            b = 45;
+            int a = 3, b = 45;
 
         c++:
-            a = 3;
-            b = 45;
+            int a = 3, b = 45;
 
 
 group: Conditions

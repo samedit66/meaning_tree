@@ -255,7 +255,7 @@ public class JavaViewer extends LanguageViewer {
     }
 
     private String toString(EmptyStatement emptyStatement) {
-        return ";";
+        return "";
     }
 
     private String toString(FunctionDefinition functionDefinition) {

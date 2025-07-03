@@ -196,7 +196,7 @@ public class CppViewer extends LanguageViewer {
     }
 
     private String toString(EmptyStatement emptyStatement) {
-        return ";";
+        return "";
     }
 
     /*******************************************************************/
