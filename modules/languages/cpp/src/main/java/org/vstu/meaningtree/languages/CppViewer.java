@@ -41,10 +41,7 @@ import org.vstu.meaningtree.nodes.interfaces.HasInitialization;
 import org.vstu.meaningtree.nodes.io.*;
 import org.vstu.meaningtree.nodes.memory.MemoryAllocationCall;
 import org.vstu.meaningtree.nodes.memory.MemoryFreeCall;
-import org.vstu.meaningtree.nodes.statements.CompoundStatement;
-import org.vstu.meaningtree.nodes.statements.DeleteStatement;
-import org.vstu.meaningtree.nodes.statements.ExpressionStatement;
-import org.vstu.meaningtree.nodes.statements.ReturnStatement;
+import org.vstu.meaningtree.nodes.statements.*;
 import org.vstu.meaningtree.nodes.statements.assignments.AssignmentStatement;
 import org.vstu.meaningtree.nodes.statements.assignments.MultipleAssignmentStatement;
 import org.vstu.meaningtree.nodes.statements.conditions.IfStatement;
@@ -193,8 +190,13 @@ public class CppViewer extends LanguageViewer {
             case FunctionDefinition functionDefinition -> toString(functionDefinition);
             case ArrayInitializer arrayInitializer -> toString(arrayInitializer);
             case ReturnStatement returnStatement -> toString(returnStatement);
+            case EmptyStatement emptyStatement -> toString(emptyStatement);
             default -> throw new UnsupportedViewingException("Unexpected value: " + node);
         };
+    }
+
+    private String toString(EmptyStatement emptyStatement) {
+        return ";";
     }
 
     /*******************************************************************/

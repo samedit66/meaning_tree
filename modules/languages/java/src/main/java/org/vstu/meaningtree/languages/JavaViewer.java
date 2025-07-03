@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import org.vstu.meaningtree.exceptions.MeaningTreeException;
 import org.vstu.meaningtree.exceptions.UnsupportedViewingException;
 import org.vstu.meaningtree.languages.configs.params.EnforceEntryPoint;
+import org.vstu.meaningtree.nodes.statements.EmptyStatement;
 import org.vstu.meaningtree.utils.type_inference.*;
 import org.vstu.meaningtree.nodes.*;
 import org.vstu.meaningtree.nodes.declarations.*;
@@ -248,8 +249,13 @@ public class JavaViewer extends LanguageViewer {
             case ContainsOp op -> toString(op);
             case ReferenceEqOp op -> toString(op);
             case FunctionDefinition functionDefinition -> toString(functionDefinition);
+            case EmptyStatement emptyStatement -> toString(emptyStatement);
             default -> throw new UnsupportedViewingException(String.format("Can't stringify node %s", node.getClass()));
         };
+    }
+
+    private String toString(EmptyStatement emptyStatement) {
+        return ";";
     }
 
     private String toString(FunctionDefinition functionDefinition) {

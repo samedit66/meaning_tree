@@ -122,7 +122,7 @@ public class PythonLanguage extends LanguageParser {
             case "binary_operator" -> fromBinaryExpressionTSNode(node);
             case "unary_operator" -> fromUnaryExpressionTSNode(node);
             case "not_operator" -> fromNotOperatorTSNode(node);
-            case "pass_statement", "ellipsis" -> null;
+            case "pass_statement", "ellipsis" -> fromPassStatementOrEllipsis(node);
             case "integer" -> fromIntegerLiteralTSNode(node);
             case "float" -> fromFloatLiteralTSNode(node);
             case "identifier" -> fromIdentifier(node);
@@ -181,6 +181,10 @@ public class PythonLanguage extends LanguageParser {
 
     private void rollbackContext() {
         scope.leave();
+    }
+
+    private EmptyStatement fromPassStatementOrEllipsis(TSNode node) {
+        return new EmptyStatement();
     }
 
     private Node fromComprehension(TSNode node) {

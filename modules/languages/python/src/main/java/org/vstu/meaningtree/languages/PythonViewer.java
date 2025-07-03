@@ -44,10 +44,7 @@ import org.vstu.meaningtree.nodes.io.FormatPrint;
 import org.vstu.meaningtree.nodes.memory.MemoryAllocationCall;
 import org.vstu.meaningtree.nodes.memory.MemoryFreeCall;
 import org.vstu.meaningtree.nodes.modules.*;
-import org.vstu.meaningtree.nodes.statements.CompoundStatement;
-import org.vstu.meaningtree.nodes.statements.DeleteStatement;
-import org.vstu.meaningtree.nodes.statements.ExpressionStatement;
-import org.vstu.meaningtree.nodes.statements.ReturnStatement;
+import org.vstu.meaningtree.nodes.statements.*;
 import org.vstu.meaningtree.nodes.statements.assignments.AssignmentStatement;
 import org.vstu.meaningtree.nodes.statements.assignments.MultipleAssignmentStatement;
 import org.vstu.meaningtree.nodes.statements.conditions.IfStatement;
@@ -168,9 +165,14 @@ public class PythonViewer extends LanguageViewer {
             case MultipleAssignmentStatement stmtSequence -> assignmentToString(stmtSequence);
             case CastTypeExpression cast -> callsToString(cast);
             case Comprehension compr -> comprehensionToString(compr);
+            case EmptyStatement emptyStatement -> emptyStatementToString(emptyStatement);
             case null -> throw new MeaningTreeException("Null node detected");
             default -> throw new UnsupportedViewingException("Unsupported tree element: " + node.getClass().getName());
         };
+    }
+
+    private String emptyStatementToString(EmptyStatement emptyStatement) {
+        return "pass";
     }
 
     private String definitionArgumentToString(DefinitionArgument arg) {
