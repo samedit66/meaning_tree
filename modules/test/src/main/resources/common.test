@@ -943,7 +943,8 @@ group: SimpleStatements
             }
 
         c++:
-            if (a) {
+            if (a)
+            {
             }
 
 
@@ -963,20 +964,20 @@ group: Conditions
         python:
             k: int = 1
             if a > 0:
-                a += 1
+                a += 15
                 k = x + 1
 
         java:
             int k = 1;
             if (a > 0) {
-                a++;
+                a += 15;
                 k = x + 1;
             }
 
         isolated c++:
             int k = 1;
             if (a > 0) {
-                a++;
+                a += 15;
                 k = x + 1;
             }
 
@@ -1078,35 +1079,35 @@ group: Conditions
             k: int = 20
             if a:
                 b = a * 3
-                x += 1
+                x += 15
             elif b:
                 b = m * 3
-                x += 1
+                x += 15
             elif c:
                 k = l * 3
-                x += 1
+                x += 15
             else:
                 d *= 5
-                x += 1
+                x += 15
 
         c++:
             int b = 1;
             int k = 20;
             if (a) {
                 b = a * 3;
-                x++;
+                x += 15;
             }
             else if (b) {
                 b = m * 3;
-                x++;
+                x += 15;
             }
             else if (c) {
                 k = l * 3;
-                x++;
+                x += 15;
             }
             else {
                 d *= 5;
-                x++;
+                x += 15;
             }
 
         java:
@@ -1114,89 +1115,88 @@ group: Conditions
             int k = 20;
             if (a) {
                 b = a * 3;
-                x++;
+                x += 15;
             }
             else if (b) {
                 b = m * 3;
-                x++;
+                x += 15;
             }
             else if (c) {
                 k = l * 3;
-                x++;
+                x += 15;
             }
             else {
                 d *= 5;
-                x++;
+                x += 15;
             }
 
 
     case: NestedAlternativesCompound
         python:
             if a > b:
-                z += 1
+                z += 15
                 if x and y:
                     if x == 7:
-                        x += 1
-                    c += 1
-                c += 1
+                        x += 15
+                    c += 15
+                c += 15
             elif a < b:
-                x += 1
+                x += 15
                 if x > 5:
                     if x != 7:
                         print("alarm")
                     else:
-                        k += 1
-                    c += 1
-                y -= 1
+                        k += 15
+                    c += 15
+                y -= 15
 
         java:
             if (a > b) {
-                z++;
+                z += 15;
                 if (x && y) {
                     if (x == 7) {
-                        x++;
+                        x += 15;
                     }
-                    c++;
+                    c += 15;
                 }
-                c++;
+                c += 15;
             }
             else if (a < b) {
-                x++;
+                x += 15;
                 if (x > 5) {
                     if (x != 7) {
                         System.out.println("alarm");
                     }
                     else {
-                        k++;
+                        k += 15;
                     }
-                    c++;
+                    c += 15;
                 }
-                y--;
+                y -= 15;
             }
 
         c++:
             if (a > b) {
-                z++;
+                z += 15;
                 if (x && y) {
                     if (x == 7) {
-                        x++;
+                        x += 15;
                     }
-                    c++;
+                    c += 15;
                 }
-                c++;
+                c += 15;
             }
             else if (a < b) {
-                x++;
+                x += 15;
                 if (x > 5) {
                     if (x != 7) {
                         std::cout << "alarm" << std::endl;
+                    } else {
+                        k += 15;
                     }
-                    else {
-                        k++;
-                    }
-                    c++;
+                    c += 15;
                 }
-                y--;
+                y -= 15;
             }
 
 
