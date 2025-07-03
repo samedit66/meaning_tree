@@ -390,15 +390,15 @@ group: SimpleExpressionsTest
     case: InstanceOf
         python:
             a: int = 0
-            result: bool = isinstance(a, int)
+            isinstance(a, int)
 
         java:
             int a = 0;
-            boolean result = a instanceof Integer;
+            a instanceof Integer;
 
         c++:
             int a = 0;
-            bool result = dynamic_cast<int>(a) != nullptr;
+            dynamic_cast<int>(a) != nullptr;
 
     case: UnaryPlusOp
         python:
@@ -435,17 +435,17 @@ group: SimpleExpressionsTest
         python:
             x: int = 0
             y: int = 0
-            a: float = x ** y
+            a: int = x ** y
 
         java:
             int x = 0;
             int y = 0;
-            float a = Math.pow(x, y);
+            int a = Math.pow(x, y);
 
         c++:
             int x = 0;
             int y = 0;
-            float a = pow(x, y);
+            int a = pow(x, y);
 
 
     case: AndOp
