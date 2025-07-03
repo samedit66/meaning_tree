@@ -18,10 +18,7 @@ import org.vstu.meaningtree.nodes.expressions.literals.*;
 import org.vstu.meaningtree.nodes.expressions.logical.*;
 import org.vstu.meaningtree.nodes.expressions.math.AddOp;
 import org.vstu.meaningtree.nodes.expressions.math.DivOp;
-import org.vstu.meaningtree.nodes.expressions.other.AssignmentExpression;
-import org.vstu.meaningtree.nodes.expressions.other.KeyValuePair;
-import org.vstu.meaningtree.nodes.expressions.other.Range;
-import org.vstu.meaningtree.nodes.expressions.other.TernaryOperator;
+import org.vstu.meaningtree.nodes.expressions.other.*;
 import org.vstu.meaningtree.nodes.expressions.unary.*;
 import org.vstu.meaningtree.nodes.interfaces.HasBodyStatement;
 import org.vstu.meaningtree.nodes.statements.CompoundStatement;
@@ -297,7 +294,7 @@ public class HindleyMilner {
             rightType = leftType;
         }
 
-        if (binaryExpression instanceof BinaryComparison) {
+        if (binaryExpression instanceof BinaryComparison || binaryExpression instanceof InstanceOfOp) {
             return new BooleanType();
         }
         else if (binaryExpression instanceof DivOp) {
