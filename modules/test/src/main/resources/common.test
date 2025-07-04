@@ -1444,6 +1444,7 @@ group: WhileLoop
 group: SwitchStatement
     case: SimpleMatch
         python:
+            test: int = 0
             match a:
                 case t:
                     test += 1
@@ -1457,9 +1458,10 @@ group: SwitchStatement
                     test = 0
 
         java:
+            int test = 0;
             switch (a) {
                 case t:
-                    test += 1;
+                    test++;
                     break;
                 case a:
                     test += 3;

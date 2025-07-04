@@ -1012,6 +1012,13 @@ public class JavaViewer extends LanguageViewer {
                     .append(indent(toStringCaseBlock(caseBlock)))
                     .append("\n");
         }
+
+        if (switchStatement.hasDefaultCase()) {
+            builder
+                    .append(indent(toStringCaseBlock(switchStatement.getDefaultCase())))
+                    .append("\n");
+        }
+
         decreaseIndentLevel();
 
         builder.append(indent("}"));

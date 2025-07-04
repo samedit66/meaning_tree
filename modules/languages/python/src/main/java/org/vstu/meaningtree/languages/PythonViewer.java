@@ -482,17 +482,18 @@ public class PythonViewer extends LanguageViewer {
                     case FallthroughCaseBlock fallthroughCaseBlock -> {
                         throw new UnsupportedOperationException("Cannot translate fallthrough case branches");
                     }
-                    case DefaultCaseBlock defaultCaseBlock -> {
-                        builder.append(
-                                String.format(
-                                        "%scase _:\n%s\n",
-                                        tab,
-                                        toString(defaultCaseBlock.getBody(), tab)
-                                )
-                        );
-                    }
                     default -> throw new IllegalStateException("Unexpected case block: " + caseBranch.getClass());
                 }
+            }
+
+            if (switchStmt.hasDefaultCase()) {
+                builder.append(
+                        String.format(
+                                "%scase _:\n%s\n",
+                                tab,
+                                toString(switchStmt.getDefaultCase().getBody(), tab)
+                        )
+                );
             }
         } else if (stmt instanceof InfiniteLoop infLoop) {
             builder.append("while True:\n");

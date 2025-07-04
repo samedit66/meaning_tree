@@ -264,6 +264,8 @@ public class CppViewer extends LanguageViewer {
             case ArrayInitializer arrayInitializer -> toString(arrayInitializer);
             case ReturnStatement returnStatement -> toString(returnStatement);
             case EmptyStatement emptyStatement -> toString(emptyStatement);
+            case BreakStatement stmt -> toString(stmt);
+            case ContinueStatement stmt -> toString(stmt);
             default -> throw new UnsupportedViewingException("Unexpected value: " + node);
         };
     }
@@ -472,6 +474,12 @@ public class CppViewer extends LanguageViewer {
         for (CaseBlock caseBlock : switchStatement.getCases()) {
             builder
                     .append(indent(toStringCaseBlock(caseBlock)))
+                    .append("\n");
+        }
+
+        if (switchStatement.hasDefaultCase()) {
+            builder
+                    .append(indent(toStringCaseBlock(switchStatement.getDefaultCase())))
                     .append("\n");
         }
         decreaseIndentLevel();
