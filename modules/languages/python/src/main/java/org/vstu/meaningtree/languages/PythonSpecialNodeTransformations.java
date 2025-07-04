@@ -36,8 +36,6 @@ import org.vstu.meaningtree.nodes.statements.loops.GeneralForLoop;
 import org.vstu.meaningtree.nodes.statements.loops.WhileLoop;
 import org.vstu.meaningtree.nodes.statements.loops.control.BreakStatement;
 import org.vstu.meaningtree.nodes.statements.loops.control.ContinueStatement;
-import org.vstu.meaningtree.utils.BodyBuilder;
-import org.vstu.meaningtree.utils.env.SymbolEnvironment;
 
 import java.util.*;
 
@@ -67,9 +65,7 @@ public class PythonSpecialNodeTransformations {
         if (stmt instanceof CompoundStatement compound) {
             body = compound;
         } else {
-            BodyBuilder bb = new BodyBuilder();
-            bb.put(stmt);
-            body = bb.build();
+            body = new CompoundStatement(stmt);
         }
         _prepend_continue_with_expression(body, update);
         body.insert(body.getLength(), update);

@@ -3,8 +3,6 @@ package org.vstu.meaningtree.nodes.statements;
 import org.vstu.meaningtree.iterators.utils.TreeNode;
 import org.vstu.meaningtree.nodes.Node;
 import org.vstu.meaningtree.nodes.Statement;
-import org.vstu.meaningtree.nodes.interfaces.HasSymbolScope;
-import org.vstu.meaningtree.utils.env.SymbolEnvironment;
 
 import java.util.ArrayList;
 import java.util.List;

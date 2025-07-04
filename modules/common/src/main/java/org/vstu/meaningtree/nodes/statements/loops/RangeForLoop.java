@@ -6,7 +6,6 @@ import org.vstu.meaningtree.nodes.Statement;
 import org.vstu.meaningtree.nodes.expressions.identifiers.SimpleIdentifier;
 import org.vstu.meaningtree.nodes.expressions.other.Range;
 import org.vstu.meaningtree.nodes.statements.CompoundStatement;
-import org.vstu.meaningtree.utils.env.SymbolEnvironment;
 
 /**
  * Цикл по диапазону целых чисел (начало и конец являются частью диапазона) с заданным шагом.

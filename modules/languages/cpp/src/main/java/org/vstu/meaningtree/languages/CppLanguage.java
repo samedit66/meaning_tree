@@ -71,8 +71,6 @@ import org.vstu.meaningtree.nodes.types.containers.*;
 import org.vstu.meaningtree.nodes.types.containers.components.Shape;
 import org.vstu.meaningtree.nodes.types.user.Class;
 import org.vstu.meaningtree.nodes.types.user.GenericClass;
-import org.vstu.meaningtree.utils.BodyBuilder;
-import org.vstu.meaningtree.utils.env.SymbolEnvironment;
 
 import java.util.*;
 
@@ -127,7 +125,7 @@ public class CppLanguage extends LanguageParser {
         // Оборачиваем функцию main в узел ProgramEntryPoint
         if (node instanceof FunctionDefinition functionDefinition
                 && functionDefinition.getName().toString().equals("main")) {
-            node = new ProgramEntryPoint(null, List.of(functionDefinition.getBody().getNodes()), node);
+            node = new ProgramEntryPoint(List.of(functionDefinition.getBody().getNodes()), node);
         }
 
         return new MeaningTree(node);
@@ -298,13 +296,11 @@ public class CppLanguage extends LanguageParser {
     }
 
     private CompoundStatement fromBlock(TSNode node) {
-        // TODO: Нужна поддержка таблицы символов
-        BodyBuilder builder = new BodyBuilder();
+        var statements = new ArrayList<Node>();
         for (int i = 1; i < node.getChildCount() - 1; i++) {
-            Node child = fromTSNode(node.getChild(i));
-            builder.put(child);
+            statements.add(fromTSNode(node.getChild(i)));
         }
-        return builder.build();
+        return new CompoundStatement(statements);
     }
 
     private CaseBlock fromSwitchGroup(TSNode switchGroup) {
@@ -1324,19 +1320,17 @@ public class CppLanguage extends LanguageParser {
     @NotNull
     private Node fromTranslationUnit(@NotNull TSNode node) {
         List<Node> nodes = new ArrayList<>();
-        FunctionDefinition entryPoint = null;
         for (int i = 0; i < node.getNamedChildCount(); i++) {
             TSNode currNode = node.getNamedChild(i);
             Node n = fromTSNode(currNode);
             nodes.add(n);
             if (n instanceof FunctionDefinition functionDefinition
                     && functionDefinition.getName().toString().equals("main")) {
-                n = new ProgramEntryPoint(null, List.of(functionDefinition.getBody().getNodes()), n);
+                n = new ProgramEntryPoint(List.of(functionDefinition.getBody().getNodes()), n);
                 return n;
             }
         }
-        SymbolEnvironment context = new SymbolEnvironment(null); //TODO: fix symbol table
-        return new ProgramEntryPoint(context, nodes, entryPoint);
+        return new ProgramEntryPoint(nodes);
     }
 
     @NotNull

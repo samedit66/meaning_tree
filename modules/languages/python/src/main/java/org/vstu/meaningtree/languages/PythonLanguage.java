@@ -672,7 +672,7 @@ public class PythonLanguage extends LanguageParser {
             return nodes.getFirst();
         }
 
-        return new ProgramEntryPoint(null, nodes, entryPointNode);
+        return new ProgramEntryPoint(nodes, entryPointNode);
     }
 
     private Identifier fromIdentifier(TSNode node) {
